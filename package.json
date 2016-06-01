@@ -1,0 +1,34 @@
+{
+	"name": "elm-maze-wars",
+	"description": "An implementation of Maze War in Elm",
+	"version": "0.0.1",
+	"license": "BSD3",
+	"private": true,
+	"build": "gulp build",
+	"scripts": {
+		"postinstall": "gulp clean && gulp build",
+		"build": "gulp build",
+		"clean": "gulp clean",
+		"test": "gulp test",
+		"watch": "gulp watch",
+		"server": "gulp build && gulp server"
+	},
+	"engineStrict": true,
+	"engines": {
+		"node": ">=4.0.0"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"browser-sync": "^2.11.1",
+		"del": "^2.2.0",
+		"elm": "^0.17.0",
+		"gulp": "^3.9.0",
+		"gulp-elm": "^0.4.4",
+		"gulp-livereload": "^3.8.1",
+		"gulp-plumber": "^1.0.1",
+		"gulp-rename": "^1.2.2",
+		"gulp-shell": "^0.5.1",
+		"gulp-submodule": "^0.1.3",
+		"gulp-util": "^3.0.7"
+	}
+}
