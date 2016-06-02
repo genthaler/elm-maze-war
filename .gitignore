@@ -1,4 +1,6 @@
 elm-stuff/
 node_modules/
+target/
 dist/
 .tags*
+npm-debug.log

@@ -6,14 +6,14 @@
 	"private": true,
 	"build": "gulp build",
 	"scripts": {
-		"postinstall": "gulp clean && gulp build",
-		"build": "gulp build",
+		"postinstall": "gulp clean",
 		"clean": "gulp clean",
+		"build": "gulp build",
 		"test": "gulp test",
 		"watch": "gulp watch",
-		"server": "gulp build && gulp server"
+		"server": "gulp"
 	},
-	"engineStrict": true,
+	"engine-strict": true,
 	"engines": {
 		"node": ">=4.0.0"
 	},

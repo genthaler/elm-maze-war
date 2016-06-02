@@ -1,32 +1,48 @@
 var gulp = require('gulp'),
-  shell = require('gulp-shell'),
-  del = require('del'),
-  elm = require('gulp-elm'),
-  browserSync = require('browser-sync').create();
-var src = ['elm/**/*.elm'];
-gulp.task('clean', function() {
-  return del(['elm-stuff']);
-});
+    shell = require('gulp-shell'),
+    del = require('del'),
+    elm = require('gulp-elm'),
+    browserSync = require('browser-sync')
+    .create(),
+    src = ['elm/**/*.elm'],
+    browserSyncInit = function() {
+        browserSync.init({
+            server: {
+                baseDir: "target",
+                index: "index.html"
+            },
+            port: 5000,
+            ui: {
+                port: 5001
+            }
+        });
+    },
+    browserSyncReload = browserSync.reload,
+    noop = function() {};
+// internal tasks
 gulp.task('elm-init', elm.init);
-gulp.task('copy', function() {
-  return gulp.src(['./resources/*']).pipe(gulp.dest('./dist'));
+gulp.task('reload', browserSyncReload);
+gulp.task('compile-and-reload', ['compile'], browserSyncReload);
+gulp.task('pre-server', browserSyncInit);
+// external tasks
+gulp.task('clean', function() {
+    return del(['elm-stuff', 'target']);
 });
-gulp.task('build', ['elm-init'], function() {
-  return gulp.src(src).pipe(elm.bundle('elm.js')).pipe(gulp.dest('dist/'));
+gulp.task('process-resources', [], function() {
+    return gulp.src(['./resources/*'])
+        .pipe(gulp.dest('target'));
 });
-gulp.task('run', function() {
-  browserSync.reload()
-})
-gulp.task('watch', function() {
-  gulp.watch(src, ['build'])
+gulp.task('compile', ['process-resources', 'elm-init'], function() {
+    return gulp.src(src)
+        .pipe(elm.bundle('elm.js'))
+        .pipe(gulp.dest('target/'));
 });
-gulp.task('default', function() {
-  browserSync.init({
-    server: {
-      baseDir: "./dist"
-    }
-  });
-  gulp.run(['copy', 'build', 'run']);
-  gulp.watch('elm', ['build', 'run'])
-  gulp.watch('resources', ['copy', 'run'])
+gulp.task('package', ['compile'], noop);
+gulp.task('server', ['pre-server', 'compile'], function() {
+    browserSyncReload();
 });
+gulp.task('watch', ['server'], function() {
+    gulp.watch('elm', ['compile-and-reload']);
+    gulp.watch('resources', ['process-resources', 'reload']);
+});
+gulp.task('default', ['watch'], noop);
