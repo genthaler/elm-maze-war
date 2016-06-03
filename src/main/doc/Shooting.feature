@@ -3,22 +3,16 @@ Feature: Standing there looking
     As a player
     I want the walls and enemies in front of me to be drawn correctly
 
-    Scenario: Starting a game
-        Given the game has just started
-        And there are no players
-        Then I should see the ground and at least one wall in front of me
+    Scenario: Shooting
+        Given A player shoots
+        Then a new bullet should move in the direction the player is currently facing
 
-    Scenario: shooting
-        Given the game has started
-        When I shoot a bullet
-        Then the bullet should move in a straight line until it hits a wall or a player
-
-    Scenario: shot a wall
+    Scenario: Wall shot
         Given A bullet has been shot
         When the bullet hits a wall
         Then the bullet will explode
 
-    Scenario: Shot a player
+    Scenario: Player shot
         Given I shot a bullet
         When the bullet hits another player
         Then the player should die
