@@ -1,14 +1,20 @@
-module Example exposing (..)
+module Example exposing (tests)
 
-import String
-import ElmTest exposing (..)
+import ElmTestBDDStyle exposing (..)
+import Check.Producer exposing (..)
 
 
 tests : Test
 tests =
-    suite "A Test Suite"
-        [ test "Addition" (assertEqual (3 + 7) 10)
-        , test "String.left" (assertEqual "a" (String.left 1 "abcdefg"))
-        , test "This test should fail"
-            (assert False)
+    describe "A Test Suite"
+        [ it "adds two numbers"
+            <| expect (3 + 7) toBe 10
+        , it "fails for non-sense stuff"
+            <| expect True toBe True
+        , itAlways "ends up with the same list when reversing twice"
+            <| expectThat (\list -> List.reverse (List.reverse list))
+                isTheSameAs
+                (identity)
+                forEvery
+                (list int)
         ]
