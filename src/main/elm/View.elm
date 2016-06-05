@@ -16,7 +16,7 @@ import Window
 {-| generate a View from a Model
 -}
 view : Model -> Html Msg
-view { person, maybeWindowSize, maybeTexture, isLocked } =
+view { person, maybeWindowSize, maybeTexture, pointerLock } =
     case ( maybeWindowSize, maybeTexture ) of
         ( Nothing, _ ) ->
             text ""
@@ -25,7 +25,7 @@ view { person, maybeWindowSize, maybeTexture, isLocked } =
             text ""
 
         ( Just windowSize, Just texture ) ->
-            layoutScene windowSize isLocked texture person
+            layoutScene windowSize pointerLock.isLocked texture person
 
 
 layoutScene : Window.Size -> Bool -> WebGL.Texture -> Model.Person -> Html Msg

@@ -4,6 +4,7 @@ import Model
 import Math.Vector3 as Vector3 exposing (Vec3, toRecord, normalize, vec3, getY, getX, getZ, setY, add, toTuple, i, j, k, scale)
 import Math.Matrix4 exposing (makeRotate, transform)
 import Ports
+import Keyboard.Extra
 
 
 {-| Take a Msg and a Model and return an updated Model
@@ -21,10 +22,16 @@ update msg model =
             , Cmd.none
             )
 
-        Model.KeyChange keyfunc ->
-            ( { model | keys = keyfunc model.keys }
-            , Cmd.none
-            )
+        Model.KeyboardExtraMsg keyMsg ->
+            let
+                ( keyboardModel, keyboardCmd ) =
+                    Keyboard.Extra.update keyMsg model.keys.keyboardModel
+            in
+                ( { model
+                    | keys = Model.toKeys keyboardModel
+                  }
+                , Cmd.map Model.KeyboardExtraMsg keyboardCmd
+                )
 
         Model.Resize windowSize ->
             ( { model | maybeWindowSize = Just windowSize }
@@ -37,50 +44,39 @@ update msg model =
             )
 
         Model.LockRequest wantToBeLocked ->
-            ( { model | wantToBeLocked = wantToBeLocked }
-            , if model.wantToBeLocked == model.isLocked then
-                Cmd.none
-              else if model.wantToBeLocked then
-                Ports.requestPointerLock ()
-              else
-                Ports.exitPointerLock ()
-            )
+            let
+                pointerLock =
+                    model.pointerLock
+            in
+                ( { model | pointerLock = { pointerLock | wantToBeLocked = wantToBeLocked } }
+                , if model.pointerLock.wantToBeLocked == model.pointerLock.isLocked then
+                    Cmd.none
+                  else if model.pointerLock.wantToBeLocked then
+                    Ports.requestPointerLock ()
+                  else
+                    Ports.exitPointerLock ()
+                )
 
         Model.LockUpdate isLocked ->
-            ( { model | isLocked = isLocked }
-            , Cmd.none
-            )
+            let
+                pointerLock =
+                    model.pointerLock
+            in
+                ( { model | pointerLock = { pointerLock | isLocked = isLocked } }
+                , Cmd.none
+                )
 
         Model.Animate dt ->
             ( { model
                 | person =
                     model.person
-                        |> walk (directions model.keys)
-                        |> jump model.keys.space
+                        |> walk model.keys.wasd
+                        |> jump model.keys.spaceKey
                         |> gravity (dt / 500)
                         |> physics (dt / 500)
               }
             , Cmd.none
             )
-
-
-directions : Model.Keys -> { x : Int, y : Int }
-directions { left, right, up, down } =
-    let
-        direction a b =
-            case ( a, b ) of
-                ( True, False ) ->
-                    -1
-
-                ( False, True ) ->
-                    1
-
-                _ ->
-                    0
-    in
-        { x = direction left right
-        , y = direction down up
-        }
 
 
 flatten : Vec3 -> Vec3

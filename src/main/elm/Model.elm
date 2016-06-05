@@ -1,10 +1,11 @@
-module Model exposing (Msg(..), Model, Person, Keys, MouseMovement, Args, init, direction, eyeLevel)
+module Model exposing (Msg(..), Model, Person, MouseMovement, Args, init, direction, eyeLevel, toKeys)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import WebGL exposing (..)
 import Window
 import Time exposing (..)
 import Task exposing (Task)
+import Keyboard.Extra
 
 
 {-| Every half a second there's an event coming through;
@@ -16,7 +17,7 @@ or the window is being resized
 type Msg
     = TextureError Error
     | TextureLoaded Texture
-    | KeyChange (Keys -> Keys)
+    | KeyboardExtraMsg Keyboard.Extra.Msg
     | MouseMove MouseMovement
     | LockRequest Bool
     | LockUpdate Bool
@@ -33,11 +34,16 @@ type alias Person =
 
 
 type alias Keys =
-    { left : Bool
-    , right : Bool
-    , up : Bool
-    , down : Bool
-    , space : Bool
+    { keyboardModel : Keyboard.Extra.Model
+    , spaceKey : Bool
+    , wasd : { x : Int, y : Int }
+    , keyList : List Keyboard.Extra.Key
+    }
+
+
+type alias PointerLock =
+    { wantToBeLocked : Bool
+    , isLocked : Bool
     }
 
 
@@ -52,20 +58,28 @@ type alias MouseMovement =
 -}
 type alias Model =
     { person : Person
+    , keys : Keys
+    , pointerLock : PointerLock
     , maybeTexture : Maybe Texture
     , maybeWindowSize : Maybe Window.Size
-    , keys : Keys
-    , wantToBeLocked : Bool
-    , isLocked : Bool
     , message : String
     }
 
 
-{-| This is the applications's Model data structure
+{-| This is a data structure representing the arguments to Html.programWithFlags
 -}
 type alias Args =
     { movement : MouseMovement
     , isLocked : Bool
+    }
+
+
+toKeys : Keyboard.Extra.Model -> Keys
+toKeys keyboardModel =
+    { keyboardModel = keyboardModel
+    , spaceKey = Keyboard.Extra.isPressed Keyboard.Extra.Space keyboardModel
+    , wasd = Keyboard.Extra.wasd keyboardModel
+    , keyList = Keyboard.Extra.pressedDown keyboardModel
     }
 
 
@@ -78,25 +92,32 @@ It's still a useful example using Html.programWithFlags though.
 -}
 init : Args -> ( Model, Cmd Msg )
 init { movement, isLocked } =
-    ( { person =
-            { position = vec3 0 eyeLevel -10
-            , velocity = vec3 0 0 0
-            , horizontalAngle = degrees 90
-            , verticalAngle = 0
-            }
-      , maybeTexture = Nothing
-      , maybeWindowSize = Nothing
-      , keys = Keys False False False False False
-      , wantToBeLocked = True
-      , isLocked = isLocked
-      , message = "No texture yet"
-      }
-    , Cmd.batch
-        [ loadTexture "woodCrate.jpg"
-            |> Task.perform TextureError TextureLoaded
-        , Window.size |> Task.perform (always Resize ( 0, 0 )) Resize
-        ]
-    )
+    let
+        ( keyboardModel, keyboardCmd ) =
+            Keyboard.Extra.init
+    in
+        ( { person =
+                { position = vec3 0 eyeLevel -10
+                , velocity = vec3 0 0 0
+                , horizontalAngle = degrees 90
+                , verticalAngle = 0
+                }
+          , keys = toKeys keyboardModel
+          , pointerLock =
+                { wantToBeLocked = True
+                , isLocked = isLocked
+                }
+          , maybeTexture = Nothing
+          , maybeWindowSize = Nothing
+          , message = "No texture yet"
+          }
+        , Cmd.batch
+            [ loadTexture "woodCrate.jpg"
+                |> Task.perform TextureError TextureLoaded
+            , Window.size |> Task.perform (always Resize ( 0, 0 )) Resize
+            , Cmd.map KeyboardExtraMsg keyboardCmd
+            ]
+        )
 
 
 {-| direction is a derived property of Model.Person.{horizontalAngle, verticalAnglem}
