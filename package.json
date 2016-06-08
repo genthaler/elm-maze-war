@@ -26,6 +26,7 @@
 		"gulp-elm": "^0.4.4",
 		"gulp-gh-pages": "^0.5.4",
 		"gulp-livereload": "^3.8.1",
+		"gulp-notify": "^2.2.0",
 		"gulp-plumber": "^1.0.1",
 		"gulp-rename": "^1.2.2",
 		"gulp-shell": "^0.5.1",
