@@ -8,8 +8,8 @@
 	"scripts": {
 		"postinstall": "gulp clean",
 		"clean": "gulp clean",
-		"build": "gulp build",
 		"test": "gulp test",
+		"package": "gulp package",
 		"watch": "gulp watch",
 		"server": "gulp"
 	},
