@@ -49,7 +49,7 @@ gulp.task('package', ['process-resources', 'compile', 'test'], noop);
 gulp.task('server', ['pre-server', 'process-resources', 'compile'], function() {
   browserSyncReload();
 });
-gulp.task('deploy', function() {
+gulp.task('deploy', ['package'], function() {
   return gulp.src('./target/**/*').pipe(ghPages());
 });
 gulp.task('watch', ['test', 'server'], function() {
