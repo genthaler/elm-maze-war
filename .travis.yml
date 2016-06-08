@@ -1,8 +1,13 @@
 sudo: false # force container-based infrastructure
 language: node_js
-node_js:
-  - "4.3"
+node_js: stable
 # install:
 #   - npm install -g elm@0.17
+before_script:
+  - git config --global user.name "John Doe"
+  - git config --global user.email johndoe@example.com
 script:
   - npm run package
+cache:
+  directories:
+    - elm-stuff/build-artifacts
