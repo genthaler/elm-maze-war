@@ -7,7 +7,7 @@ before_script:
   - git config --global user.name "John Doe"
   - git config --global user.email johndoe@example.com
 script:
-  - npm run deploy
+  - npm run package
 cache:
   directories:
     - elm-stuff/build-artifacts
