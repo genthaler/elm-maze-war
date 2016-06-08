@@ -20,4 +20,6 @@ npm run server
 
 This will open <http://localhost:4000> in your browser. Have fun!
 
+[![Build Status](https://travis-ci.org/genthaler/elm-maze-war.svg?branch=master)](https://travis-ci.org/genthaler/elm-maze-war)
+
 [demo]: http://genthaler.github.io/elm-maze-war
