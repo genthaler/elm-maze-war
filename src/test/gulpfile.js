@@ -5,25 +5,9 @@ var gulp = require('gulp'),
     browserSync = require('browser-sync')
     .create(),
     src = ['elm/**/*.elm', '../main/elm/**/*.elm'],
-    browserSyncInit = function() {
-        browserSync.init({
-            server: {
-                baseDir: "target",
-                index: "TestRunner.html"
-            },
-            port: 5000,
-            ui: {
-                port: 5001
-            }
-        });
-    },
-    browserSyncReload = browserSync.reload,
     noop = function() {};
 // internal tasks
 gulp.task('elm-init', elm.init);
-gulp.task('reload', browserSyncReload);
-gulp.task('compile-and-reload', ['compile'], browserSyncReload);
-gulp.task('pre-server', browserSyncInit);
 // external tasks
 gulp.task('clean', function() {
     return del(['elm-stuff', 'target']);
@@ -31,16 +15,19 @@ gulp.task('clean', function() {
 gulp.task('compile', ['elm-init'], function() {
     return gulp.src('elm/TestRunner.elm')
         .pipe(elm.make({
-            filetype: 'html',
+            filetype: 'js',
             warn: true
         }))
         .pipe(gulp.dest('target'));
 });
+gulp.task('test', ['compile'], () => {
+    return gulp.src('target/TestRunner.js')
+        .pipe(shell(
+            ['node target/TestRunner.js']
+        ));
+});
 gulp.task('package', ['compile'], noop);
-gulp.task('server', ['pre-server', 'compile'], function() {
-    browserSyncReload();
+gulp.task('watch', ['test'], function() {
+    gulp.watch(src, ['test']);
 });
-gulp.task('watch', ['server'], function() {
-    gulp.watch(src, ['run']);
-});
-gulp.task('default', ['watch'], noop);
+gulp.task('default', ['watch'], noop);;

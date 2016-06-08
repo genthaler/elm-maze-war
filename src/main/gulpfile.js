@@ -11,9 +11,9 @@ var gulp = require('gulp'),
                 baseDir: "target",
                 index: "index.html"
             },
-            port: 5000,
+            port: 4000,
             ui: {
-                port: 5001
+                port: 4001
             }
         });
     },
@@ -34,7 +34,9 @@ gulp.task('process-resources', [], function() {
 });
 gulp.task('compile', ['process-resources', 'elm-init'], function() {
     return gulp.src(src)
-        .pipe(elm.bundle('elm.js'))
+        .pipe(elm.bundle('elm.js', {
+            warn: true
+        }))
         .pipe(gulp.dest('target/'));
 });
 gulp.task('package', ['compile'], noop);
