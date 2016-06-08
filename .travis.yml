@@ -1,11 +1,15 @@
 sudo: false
 language: node_js
 node_js: stable
+before_script:
+  - git config --global user.name '${GIT_NAME}'
+  - git config --global user.email '${GIT_NAME}'
 script:
-- npm run deploy
+  - npm run deploy
 cache:
   directories:
-  - elm-stuff/build-artifacts
+    - elm-stuff/build-artifacts
 env:
   global:
-    secure: Ry4byyZbXqK3Aj29i+hrAUbYiqZ1GCM7n6zAG0XIzmteNz0fYz388gee0QRGeZkF3h/OaNW2xIDVBI8OPHP5Z8tFrFw+gy6rkyMCMkyG7c5ixQ72J+oL6KiRHXQuwrax/2m0gsHRxm0Lmoms7Ukj8c+2Zj8zd85sAkp9A4nKPxkuTK/YMqz9TXMVKqRIsG2bXLV5j9bekjH1Ige9/wnohW7n7/G8yAzEzO6qQGneB4UAEzpVRhLeMgYXFRKzjTOJHyL2fyeMAp67PuHvFnqFS3R/fZqJwq4+c9OuxrfcDJkY3YHTg7apBrs2xIoJwUqeVJidaAQHGFx/A6rQ6oQS9jxcHSSL4CxLR0yOV1bY211+lq5mvEn/xCdm8p+FmoE9e2EzFCGZazB92j2yLZYuwFnWB4Y7y2SxQ9oy4ggYZGdBXBT7ZD+4qbT2d31DfuoPo+8vdUnTI9FeT8XL4DtVrMlvRYeBWPpY3EU8r7TxSKbkh8n9VDtscBEPiLMXVhPOni4IQNEaFVG/wnG9TxTpRwAg2j4REY52j6m3C2PBlUPUrpBnMj/Y4C0Qt3Yb7EpieUe9BH9PpjwXyfPt7a2gJTJ/SzWB+/7e52tUQf2Nv/4aZJvpn/Z7q1QVbHcEzS6EA10VjW66ExjxDtCMiP/NXYnjBNNKAoMrkSnCfkZWNSA=
+    - GITHUB_REPO: "genthaler/elm-maze-war"
+    - secure: Om/dekwneQJgiaclxxCilQBLuILy0I1S4cBeZimx6/94e8kZnVHgiYSPOkZ5VWtqc2nx35/DmyfIBmdLQvM+6qtc0lbO3OQ9+YL64QxCmCnhVVRJrAPHECftesfifvf0MnG0g4i9C/7pz+znqFivtltA1JBC5q1POM0/b3KDejhp3HVoZPWiOwaho/UdGn/loQUiIB5g4qunur85HhgKQeU3285Yx9Yt0ycKXGJLmtBUlCe2bhI8sFekQjH3Nq9UVGtRiyuUTcKY7Et8uH7RVRn2+GsTuyNGkt3Krl//BfTTRTTk/i4MyxQUfEvFVDB4GWzxvSmggoe2EEM5jIEubsglK6CQAnTTTfB7CkxuZheFcvgJxG7nT1kqApe457drjITY8Fm7bJA1wMBpEGA1GIKlhmcnTgJpvzH2xQwaVJYOT/xRWx9RXeD8DEqA6MiWG2RYqyblRkLCcbfekC3NSr4nKQZzBAZJo5XiYQn7aftK2BvxDcTW/qdVG4gIJwnVZ2vrbs+cwrknA7CADRIR74N0xcFPkylWIJ3PYkVTAH445Sj1Knf9PG145T00NCdW5YT5ELv/byFGQs9XcM07Hi8FbCTqIVhMOxusiuC+ckeRtdjj8aqHoaq1CzB2YcYmFDlS2rSKWRTBuTjVkSwOjEu4u0ul6HP1pVxWiTF7SDg=
