@@ -4,7 +4,7 @@ _An implementation of Maze War in Elm_
 
 Check out [my blog](http://genthaler.github.io) for the story of its creation!
 
-Make sure you have the latest version of Chrome or Firefox and then click the following image to try out the **[live demo][demo]**:
+Make sure you have the latest version of Chrome ~~or Firefox or Safari~~ and then click the following image to try out the **[live demo][demo]**:
 
 [![Live Demo](resources/ScreenShot.png)][demo]
 
