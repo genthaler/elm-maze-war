@@ -10,6 +10,7 @@
 		"clean": "gulp clean",
 		"test": "gulp test",
 		"package": "gulp package",
+		"deploy": "gulp deploy",
 		"watch": "gulp watch",
 		"server": "gulp"
 	},
