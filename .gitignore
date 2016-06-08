@@ -4,3 +4,5 @@ target/
 dist/
 .tags*
 npm-debug.log
+
+.publish/

@@ -1,25 +1,58 @@
 var gulp = require('gulp'),
-  del = require('del'),
   shell = require('gulp-shell'),
-  browserSync = require('browser-sync').create();
-require('gulp-submodule')(gulp);
-var main = gulp.submodule('main', {
-  filepath: "src/main"
+  del = require('del'),
+  elm = require('gulp-elm'),
+  ghPages = require('gulp-gh-pages'),
+  browserSync = require('browser-sync').create(),
+  src = ['src/**/*.elm'],
+  test = ['src/**/*.elm', 'test/**/*.elm'],
+  browserSyncInit = function() {
+    browserSync.init({
+      server: {
+        baseDir: "target",
+        index: "index.html"
+      },
+      port: 4000,
+      ui: {
+        port: 4001
+      }
+    });
+  },
+  browserSyncReload = browserSync.reload,
+  noop = function() {};
+// internal tasks
+gulp.task('elm-init', elm.init);
+gulp.task('reload', ['package'], browserSyncReload);
+gulp.task('pre-server', browserSyncInit);
+// external tasks
+gulp.task('clean', function() {
+  return del(['elm-stuff', 'target']);
 });
-var test = gulp.submodule('test', {
-  filepath: "src/test"
+gulp.task('process-resources', [], function() {
+  return gulp.src(['./resources/*']).pipe(gulp.dest('target'));
 });
-gulp.task('main-clean', shell.task('gulp clean', {
-  cwd: 'src/main'
-}));
-gulp.task('test-clean', shell.task('gulp clean', {
-  cwd: 'src/test'
-}));
-gulp.task('main-default', shell.task('gulp', {
-  cwd: 'src/main'
-}))
-gulp.task('test-default', shell.task('gulp', {
-  cwd: 'src/test'
-}));
-gulp.task('clean', ['main-clean', 'test-clean']);
-gulp.task('default', ['main-default', 'test-default'], function() {});
+gulp.task('compile', ['elm-init'], function() {
+  return gulp.src('src/Main.elm').pipe(elm.bundle('elm.js', {
+    warn: true
+  })).pipe(gulp.dest('target/'));
+});
+gulp.task('test-compile', ['elm-init'], function() {
+  return gulp.src('test/TestRunner.elm').pipe(elm.bundle('TestRunner.js', {
+    warn: true
+  })).pipe(gulp.dest('target'));
+});
+gulp.task('test', ['test-compile'], function() {
+  return gulp.src('target/TestRunner.js').pipe(shell(
+    ['node target/TestRunner.js']))
+});
+gulp.task('package', ['process-resources', 'compile', 'test'], noop);
+gulp.task('server', ['pre-server', 'process-resources', 'compile'], function() {
+  browserSyncReload();
+});
+gulp.task('deploy', function() {
+  return gulp.src('./target/**/*').pipe(ghPages());
+});
+gulp.task('watch', ['test', 'server'], function() {
+  gulp.watch(['resources/**/*', 'src/**/*', 'test/**/*'], ['reload']);
+});
+gulp.task('default', ['watch'], noop);
