@@ -2,14 +2,17 @@ sudo: false
 language: node_js
 node_js: stable
 before_script:
-  - git config --global user.name '${GIT_NAME}'
-  - git config --global user.email '${GIT_NAME}'
+- git config --global user.name 'genthaler'
+- git config --global user.email 'genthaler@users.noreply.github.com'
+- git remote set-url origin "https://${GH_TOKEN}@github.com/genthaler/elm-maze-war.git"
 script:
-  - npm run deploy
+- npm run deploy
 cache:
   directories:
-    - elm-stuff/build-artifacts
+  - elm-stuff/build-artifacts
 env:
   global:
-    - GITHUB_REPO: "genthaler/elm-maze-war"
-    - secure: Om/dekwneQJgiaclxxCilQBLuILy0I1S4cBeZimx6/94e8kZnVHgiYSPOkZ5VWtqc2nx35/DmyfIBmdLQvM+6qtc0lbO3OQ9+YL64QxCmCnhVVRJrAPHECftesfifvf0MnG0g4i9C/7pz+znqFivtltA1JBC5q1POM0/b3KDejhp3HVoZPWiOwaho/UdGn/loQUiIB5g4qunur85HhgKQeU3285Yx9Yt0ycKXGJLmtBUlCe2bhI8sFekQjH3Nq9UVGtRiyuUTcKY7Et8uH7RVRn2+GsTuyNGkt3Krl//BfTTRTTk/i4MyxQUfEvFVDB4GWzxvSmggoe2EEM5jIEubsglK6CQAnTTTfB7CkxuZheFcvgJxG7nT1kqApe457drjITY8Fm7bJA1wMBpEGA1GIKlhmcnTgJpvzH2xQwaVJYOT/xRWx9RXeD8DEqA6MiWG2RYqyblRkLCcbfekC3NSr4nKQZzBAZJo5XiYQn7aftK2BvxDcTW/qdVG4gIJwnVZ2vrbs+cwrknA7CADRIR74N0xcFPkylWIJ3PYkVTAH445Sj1Knf9PG145T00NCdW5YT5ELv/byFGQs9XcM07Hi8FbCTqIVhMOxusiuC+ckeRtdjj8aqHoaq1CzB2YcYmFDlS2rSKWRTBuTjVkSwOjEu4u0ul6HP1pVxWiTF7SDg=
+  - GH_REF: github.com/knode/node-meatspace.git
+  - GITHUB_REPO: genthaler/elm-maze-war
+  - secure: mJeckab5CNoPqwwIJEouhkZBgAtUhVx80+CcD20iFMXzgUBtU2G+yWCAS+hEqaVjgberIScF39RjL9GlKCDX4L4vqulW7b8LcejrAXJg1n4rGyW9HTbZfFlEd711DXGKmr18YTAbHA4ZWUJi1NamrqBk0odGoATsHUbXyMgEiNpdPbUXEso1wTguhAb3hh5nTaz2Czt3obdi42ZDAV9Sls80N259dzXZbmsyYORB//Ct58w2iIGEillb4Iv79+ximgc+IZ8OPLD+uumo9gWwSFcXg5Q/iJXYs1jERNMLwg/N5XNB2ELtDsiC9aBBq3TKqUbv3A4jtrkg/uaXFDvIWPWNI/FOldR4EZSkLE4ctv0MGI2wT2uS1IKYQfe/d7MFnltgmMn8ZUO6hS+e2fcm4DgYoBX/8RQzxea1hNh+/Mz22b/bq4jmPhNDOxY1of4bCw8ecF0qZ8wPW+iO1KBFO5DGM/cm2jPGNfieplnSMD0X0gfW3uBcNPx36XK9XCSNUsRinSzvSGEsXdZ4N19+VuSGH//6cq139uZcLmcyZuR1G4Rlf92Cir0wn8Mezl2GzPtr2OLKZw3+tBwV2lAvbqhxxkLX133zdHM2F8MRkNgRO6uyBaOrDnXP5ofDtIU8FS2msnec624iGvIC7yOxPby59WeQCqrzBgvlIdhLcYg=
+  - secure: PKmEdR7Snh0QhxuLe6j3l1eyHc9dTLUfftpA4h0k4l/W4Ea4p1+3nahOc3vFBHbZ8G/JkmjRojO8kMlNqPgfDXgGqc52FAh8PYg0cfAFGjziiahhaDthrvgSi4LJjZTZO+e0JixY6tyDcowuFoau7uRrLUvOi/ndHxu8BU+AUybauLFIOMe57Kg3BXEfR7JaJ6OFGYz+q222CNFX74p8xOi+4WkwygOksmritCNsRu0nraincte7wUUPFJBhL4lyxhNm86jMGrrpcvLa7fMesRUHZd+og71wsB1eX/armVU+ZX6lcsKbXtrAsRKAuC/XbSFG7XVe/ceXIigw5Lrd7fRr9r3Bsz7Edc8ih8Q8E6Xi5IGRYZSDAwhp4gN72QCn6JQaM293lriLRahQiGNg7dJJ6WktaGatM2hVX3Fns8hgrdD0xqxfSjGePrxd8mGk2D7vjLqu0mJzRGOu6vDQOi40OdQbR8B8dFDWgD9ur+ALtXTrNXeBjd7Yb8H4fn++Uu4KpJSJPXPFuxg2AhoFgJwrBOq1JTxlPYH81Bin1a/ZMHj/QqUiNiMNcoY90Lb++VMQssLlP6lKbPxZPz1PDp/is2EwtPAefu+hKTOBMiiR/U9H5aXlnsgwsoQcj9zB/VrUv3JtN1snxgjh4FVkCx/xcanLH7V0WLi7wbiNQIk=
