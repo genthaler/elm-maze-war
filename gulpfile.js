@@ -5,6 +5,7 @@ var pjson = require('./package.json'),
   shell = require('gulp-shell'),
   del = require('del'),
   elm = require('gulp-elm'),
+  expect = require('gulp-expect-file'),
   ghPages = require('gulp-gh-pages'),
   browserSync = require('browser-sync').create(),
   resources = ['resources/**/*', '!resources/ScreenShot.png'],
@@ -43,6 +44,9 @@ gulp.task('validate', function() {
       message: "package.json and elm-package.json versions don't agree"
     });
   }
+  return gulp.src(['README.md']).pipe(expect({
+    'README.md': 'genthaler.github.io/elm-maze-war/' + pjson.version
+  }))
 });
 gulp.task('compile', ['elm-init'], function() {
   return gulp.src('src/Main.elm').pipe(elm.bundle('elm.js', {
