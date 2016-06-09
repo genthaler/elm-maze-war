@@ -12,7 +12,7 @@ import Html.App
 main : Program Model.Args
 main =
     Html.App.programWithFlags
-        { init = Model.init
+        { init = Update.init
         , update = Update.update
         , subscriptions = Ports.subscriptions
         , view = View.view

@@ -1,47 +1,47 @@
 module View exposing (view)
 
 import Html
-import Math.Matrix4 exposing (makePerspective, mul, makeLookAt, makeRotate, transform, Mat4, translate3)
-import Math.Vector3 exposing (Vec3, vec3, getY, toTuple, add, toRecord, i, j, k, scale)
+import Math.Matrix4 as Matrix4
+import Math.Vector3 as Vector3
 import Model
 import View.Wall
 import View.Ground
 import WebGL
-import Html exposing (Html, text, div, p)
-import Html.Attributes exposing (width, height, style)
-import Model exposing (Model, Msg)
+import Html
+import Html.Attributes as Attributes
+import Model
 import Window
 
 
 {-| generate a View from a Model
 -}
-view : Model -> Html Msg
+view : Model.Model -> Html.Html Model.Msg
 view { person, maybeWindowSize, maybeTexture, pointerLock } =
     case ( maybeWindowSize, maybeTexture ) of
         ( Nothing, _ ) ->
-            text ""
+            Html.text ""
 
         ( _, Nothing ) ->
-            text ""
+            Html.text ""
 
         ( Just windowSize, Just texture ) ->
             layoutScene windowSize pointerLock.isLocked texture person
 
 
-layoutScene : Window.Size -> Bool -> WebGL.Texture -> Model.Person -> Html Msg
+layoutScene : Window.Size -> Bool -> WebGL.Texture -> Model.Person -> Html.Html Model.Msg
 layoutScene windowSize isLocked texture person =
-    div
-        [ style
-            [ ( "width", toString width ++ "px" )
-            , ( "height", toString height ++ "px" )
+    Html.div
+        [ Attributes.style
+            [ ( "width", toString Attributes.width ++ "px" )
+            , ( "height", toString Attributes.height ++ "px" )
             , ( "position", "relative" )
             , ( "backgroundColor", "rgb(135, 206, 235)" )
             ]
         ]
-        [ WebGL.toHtml [ width windowSize.width, height windowSize.height, style [ ( "display", "block" ) ] ]
+        [ WebGL.toHtml [ Attributes.width windowSize.width, Attributes.height windowSize.height, Attributes.style [ ( "display", "block" ) ] ]
             (renderWorld texture (perspective windowSize person))
-        , div
-            [ style
+        , Html.div
+            [ Attributes.style
                 [ ( "position", "absolute" )
                 , ( "font-family", "monospace" )
                 , ( "text-align", "center" )
@@ -60,13 +60,13 @@ layoutScene windowSize isLocked texture person =
 
 {-| Set up 3D world
 -}
-renderWorld : WebGL.Texture -> Mat4 -> List WebGL.Renderable
+renderWorld : WebGL.Texture -> Matrix4.Mat4 -> List WebGL.Renderable
 renderWorld texture perspective =
     let
         renderedCrates =
             [ View.Wall.renderWall texture perspective
-            , View.Wall.renderWall texture (translate3 10 0 10 perspective)
-            , View.Wall.renderWall texture (translate3 -10 0 -10 perspective)
+            , View.Wall.renderWall texture (Matrix4.translate3 10 0 10 perspective)
+            , View.Wall.renderWall texture (Matrix4.translate3 -10 0 -10 perspective)
             ]
     in
         (View.Ground.renderGround perspective) :: renderedCrates
@@ -74,25 +74,25 @@ renderWorld texture perspective =
 
 {-| Calculate the viewers field of view.
 -}
-perspective : Window.Size -> Model.Person -> Mat4
+perspective : Window.Size -> Model.Person -> Matrix4.Mat4
 perspective { width, height } person =
-    mul (makePerspective 45 (toFloat width / toFloat height) 1.0e-2 100)
-        (makeLookAt person.position (person.position `add` Model.direction person) j)
+    Matrix4.mul (Matrix4.makePerspective 45 (toFloat width / toFloat height) 1.0e-2 100)
+        (Matrix4.makeLookAt person.position (person.position `Vector3.add` person.direction) Vector3.j)
 
 
-enterMsg : List (Html Msg)
+enterMsg : List (Html.Html Model.Msg)
 enterMsg =
     message "Click to go full screen and move your head with the mouse."
 
 
-exitMsg : List (Html Msg)
+exitMsg : List (Html.Html Model.Msg)
 exitMsg =
     message "Press <escape> to exit full screen."
 
 
-message : String -> List (Html Msg)
+message : String -> List (Html.Html Model.Msg)
 message msg =
-    [ p [] [ Html.text "This uses stuff that is only available in Chrome and Firefox!" ]
-    , p [] [ Html.text "WASD keys to move, space bar to jump." ]
-    , p [] [ Html.text msg ]
+    [ Html.p [] [ Html.text "This uses stuff that is only available in Chrome and Firefox!" ]
+    , Html.p [] [ Html.text "WASD keys to move, space bar to jump." ]
+    , Html.p [] [ Html.text msg ]
     ]

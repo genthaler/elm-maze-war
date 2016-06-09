@@ -1,10 +1,51 @@
-module Update exposing (update)
+module Update exposing (update, init, eyeLevel, toKeys)
 
 import Model
-import Math.Vector3 as Vector3 exposing (Vec3, toRecord, normalize, vec3, getY, getX, getZ, setY, add, toTuple, i, j, k, scale)
-import Math.Matrix4 exposing (makeRotate, transform)
+import Math.Vector3 as Vector3
+import Math.Matrix4 as Matrix4
 import Ports
 import Keyboard.Extra
+import Task
+import WebGL
+import Window
+
+
+{-| When the application first starts, this is initial state of the Model.
+
+Not using the movement attribute of Args at this time;
+it's a carryover from the original, and the additional complexity
+to actually use it is probably not worth it in this case.
+It's still a useful example using Html.programWithFlags though.
+-}
+init : Model.Args -> ( Model.Model, Cmd Model.Msg )
+init { movement, isLocked } =
+    let
+        ( keyboardModel, keyboardCmd ) =
+            Keyboard.Extra.init
+    in
+        ( { person =
+                { position = Vector3.vec3 0 eyeLevel -10
+                , velocity = Vector3.vec3 0 0 0
+                , horizontalAngle = degrees 90
+                , verticalAngle = 0
+                , direction = direction ( degrees 90, 0 )
+                }
+          , keys = toKeys keyboardModel
+          , pointerLock =
+                { wantToBeLocked = True
+                , isLocked = isLocked
+                }
+          , maybeTexture = Nothing
+          , maybeWindowSize = Nothing
+          , message = "No texture yet"
+          }
+        , Cmd.batch
+            [ WebGL.loadTexture "woodCrate.jpg"
+                |> Task.perform Model.TextureError Model.TextureLoaded
+            , Window.size |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
+            , Cmd.map Model.KeyboardExtraMsg keyboardCmd
+            ]
+        )
 
 
 {-| Take a Msg and a Model and return an updated Model
@@ -28,7 +69,7 @@ update msg model =
                     Keyboard.Extra.update keyMsg model.keys.keyboardModel
             in
                 ( { model
-                    | keys = Model.toKeys keyboardModel
+                    | keys = toKeys keyboardModel
                   }
                 , Cmd.map Model.KeyboardExtraMsg keyboardCmd
                 )
@@ -79,85 +120,115 @@ update msg model =
             )
 
 
-flatten : Vec3 -> Vec3
+toKeys : Keyboard.Extra.Model -> Model.Keys
+toKeys keyboardModel =
+    { keyboardModel = keyboardModel
+    , spaceKey = Keyboard.Extra.isPressed Keyboard.Extra.Space keyboardModel
+    , wasd = Keyboard.Extra.wasd keyboardModel
+    , keyList = Keyboard.Extra.pressedDown keyboardModel
+    }
+
+
+{-| direction is a derived property of Model.Person.{horizontalAngle, verticalAnglem}
+
+In an OO language, this would probably be implemented as a readonly getter
+(i.e. no accompanying setter).
+-}
+direction : ( Float, Float ) -> Vector3.Vec3
+direction ( h, v ) =
+    Vector3.vec3 (cos h) (sin v) (sin h)
+
+
+{-| Constant definition for eyeLevel
+-}
+eyeLevel : Float
+eyeLevel =
+    2
+
+
+flatten : Vector3.Vec3 -> Vector3.Vec3
 flatten v =
     let
         r =
-            toRecord v
+            Vector3.toRecord v
     in
-        normalize (vec3 r.x 0 r.z)
+        Vector3.normalize (Vector3.vec3 r.x 0 r.z)
 
 
 turn : Model.MouseMovement -> Model.Person -> Model.Person
 turn ( dx, dy ) person =
     let
-        h' =
+        horizontalAngle' =
             person.horizontalAngle + toFloat dx / 500
 
-        v' =
-            person.verticalAngle - toFloat dy / 500
+        verticalAngle' =
+            person.verticalAngle
+                - toFloat dy
+                / 500
+                |> clamp (degrees -45) (degrees 45)
     in
         { person
-            | horizontalAngle = h'
-            , verticalAngle = clamp (degrees -45) (degrees 45) v'
+            | horizontalAngle = horizontalAngle'
+            , verticalAngle = verticalAngle'
+            , direction = direction ( horizontalAngle', verticalAngle' )
         }
 
 
 walk : { x : Int, y : Int } -> Model.Person -> Model.Person
 walk directions person =
-    if getY person.position > Model.eyeLevel then
+    if Vector3.getY person.position > eyeLevel then
         person
     else
         let
             moveDir =
-                normalize (flatten (Model.direction person))
+                Vector3.normalize (flatten person.direction)
 
             strafeDir =
-                transform (makeRotate (degrees -90) j) moveDir
+                Matrix4.transform (Matrix4.makeRotate (degrees -90) Vector3.j) moveDir
 
             move =
-                scale (toFloat directions.y) moveDir
+                Vector3.scale (toFloat directions.y) moveDir
 
             strafe =
-                scale (toFloat directions.x) strafeDir
+                Vector3.scale (toFloat directions.x) strafeDir
         in
-            { person | velocity = adjustVelocity (move `add` strafe) }
+            { person | velocity = adjustVelocity (move `Vector3.add` strafe) }
 
 
-adjustVelocity : Vec3 -> Vec3
+adjustVelocity : Vector3.Vec3 -> Vector3.Vec3
 adjustVelocity v =
-    case toTuple v of
+    case Vector3.toTuple v of
         ( 0, 0, 0 ) ->
             v
 
         _ ->
-            scale 2 (normalize v)
+            Vector3.scale 2 (Vector3.normalize v)
 
 
 jump : Bool -> Model.Person -> Model.Person
 jump isJumping person =
-    if not isJumping || getY person.position > Model.eyeLevel then
+    if not isJumping || Vector3.getY person.position > eyeLevel then
         person
     else
         let
             v =
-                toRecord person.velocity
+                Vector3.toRecord person.velocity
         in
-            { person | velocity = vec3 v.x 2 v.z }
+            { person | velocity = Vector3.vec3 v.x 2 v.z }
 
 
 physics : Float -> Model.Person -> Model.Person
 physics dt person =
     let
         position =
-            person.position `add` scale dt person.velocity
+            person.position `Vector3.add` Vector3.scale dt person.velocity
 
         p =
-            toRecord position
+            Vector3.toRecord position
 
         position' =
-            if p.y < Model.eyeLevel then
-                vec3 p.x Model.eyeLevel p.z
+            if p.y < eyeLevel then
+                Vector3.vec3 p.x eyeLevel p.z
             else
                 position
     in
@@ -166,11 +237,11 @@ physics dt person =
 
 gravity : Float -> Model.Person -> Model.Person
 gravity dt person =
-    if getY person.position <= Model.eyeLevel then
+    if Vector3.getY person.position <= eyeLevel then
         person
     else
         let
             v =
-                toRecord person.velocity
+                Vector3.toRecord person.velocity
         in
-            { person | velocity = vec3 v.x (v.y - 2 * dt) v.z }
+            { person | velocity = Vector3.vec3 v.x (v.y - 2 * dt) v.z }
