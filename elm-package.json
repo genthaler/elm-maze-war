@@ -1,5 +1,5 @@
 {
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"summary": "An implementation of Maze War in Elm",
 	"description": "This is intended as a vehicle for me to try out Elm, and document the process",
 	"repository": "https://github.com/genthaler/elm-maze-war.git",
