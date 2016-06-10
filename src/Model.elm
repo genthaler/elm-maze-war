@@ -1,10 +1,11 @@
-module Model exposing (Msg(..), Model, Person, MouseMovement, Args, Keys)
+module Model exposing (Msg(..), Model, Person, MouseMovement, Args, Keys, IoC)
 
 import Keyboard.Extra
 import Math.Vector3 as Vector3
 import Time
 import WebGL
 import Window
+import Platform
 
 
 {-| Every half a second there's an event coming through;
@@ -76,4 +77,22 @@ type alias Model =
 type alias Args =
     { movement : MouseMovement
     , isLocked : Bool
+    }
+
+
+{-| This is a data structure containing 'named' functions
+Rather than have the modules directly depend on modules to access functions,
+pass the function itself.
+
+If compared to, say Spring Framework, this datastructure resembles an XML bean
+definition file, and the Main module is the container.
+
+Functions don't contain state, so there's no sense of a scope;
+everything is a singleton.
+-}
+type alias IoC msg =
+    { requestPointerLock : () -> Cmd msg
+    , exitPointerLock : () -> Cmd msg
+    , movement : (( Int, Int ) -> msg) -> Sub msg
+    , isLocked : (Bool -> msg) -> Sub msg
     }

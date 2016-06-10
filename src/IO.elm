@@ -1,4 +1,4 @@
-port module Ports exposing (..)
+port module IO exposing (subscriptions, ioc)
 
 {-| Collect all ports and subscriptions into their own module.
 This is mostly to avoid circular references between Main, Update and View,
@@ -48,3 +48,8 @@ subscriptions model =
                 [ Mouse.clicks (\_ -> Model.LockRequest True) ]
            )
         |> Sub.batch
+
+
+ioc : Model.IoC msg
+ioc =
+    Model.IoC requestPointerLock exitPointerLock movement isLocked

@@ -4,7 +4,6 @@ import Keyboard.Extra
 import Math.Matrix4 as Matrix4
 import Math.Vector3 as Vector3
 import Model
-import Ports
 import Task
 import WebGL
 import Window
@@ -17,8 +16,8 @@ it's a carryover from the original, and the additional complexity
 to actually use it is probably not worth it in this case.
 It's still a useful example using Html.programWithFlags though.
 -}
-init : Model.Args -> ( Model.Model, Cmd Model.Msg )
-init { movement, isLocked } =
+init : Model.IoC Model.Msg -> Model.Args -> ( Model.Model, Cmd Model.Msg )
+init ioc { movement, isLocked } =
     let
         ( keyboardModel, keyboardCmd ) =
             Keyboard.Extra.init
@@ -50,8 +49,8 @@ init { movement, isLocked } =
 
 {-| Take a Msg and a Model and return an updated Model
 -}
-update : Model.Msg -> Model.Model -> ( Model.Model, Cmd Model.Msg )
-update msg model =
+update : Model.IoC Model.Msg -> Model.Msg -> Model.Model -> ( Model.Model, Cmd Model.Msg )
+update ioc msg model =
     case msg of
         Model.TextureError err ->
             ( { model | message = "Error loading texture" }
@@ -93,9 +92,9 @@ update msg model =
                 , if model.pointerLock.wantToBeLocked == model.pointerLock.isLocked then
                     Cmd.none
                   else if model.pointerLock.wantToBeLocked then
-                    Ports.requestPointerLock ()
+                    ioc.requestPointerLock ()
                   else
-                    Ports.exitPointerLock ()
+                    ioc.exitPointerLock ()
                 )
 
         Model.LockUpdate isLocked ->
