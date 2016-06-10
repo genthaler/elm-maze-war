@@ -1,10 +1,10 @@
 module Update exposing (update, init, eyeLevel, toKeys)
 
-import Model
-import Math.Vector3 as Vector3
-import Math.Matrix4 as Matrix4
-import Ports
 import Keyboard.Extra
+import Math.Matrix4 as Matrix4
+import Math.Vector3 as Vector3
+import Model
+import Ports
 import Task
 import WebGL
 import Window

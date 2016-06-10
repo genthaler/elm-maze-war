@@ -1,10 +1,10 @@
 module Main exposing (main)
 
+import Html.App
 import Model
+import Ports
 import Update
 import View
-import Ports
-import Html.App
 
 
 {-| The Elm entrypoint

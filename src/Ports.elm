@@ -5,11 +5,11 @@ This is mostly to avoid circular references between Main, Update and View,
 but is also a nice abstraction
 -}
 
-import Model
 import AnimationFrame
 import Keyboard.Extra
-import Window
+import Model
 import Mouse
+import Window
 
 
 {-| Provide the ability to request fullscreen mode. Click screen to request lock.

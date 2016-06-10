@@ -1,20 +1,20 @@
 module View.Ground exposing (renderGround)
 
-import Math.Vector3 exposing (..)
-import Math.Matrix4 exposing (..)
-import WebGL exposing (..)
 import Color
+import Math.Matrix4 as Matrix4
+import Math.Vector3 as Vector3
+import WebGL
 
 
 {-| Describes properties of a Ground vertex
 -}
 type alias Vertex =
-    { position : Vec3, color : Vec3 }
+    { position : Vector3.Vec3, color : Vector3.Vec3 }
 
 
 {-| Render the ground
 -}
-renderGround : Mat4 -> WebGL.Renderable
+renderGround : Matrix4.Mat4 -> WebGL.Renderable
 renderGround perspective =
     WebGL.render vertexShader fragmentShader ground { perspective = perspective }
 
@@ -28,35 +28,35 @@ ground =
             color (degrees 110) 0.48
 
         topLeft =
-            Vertex (vec3 -20 -1 20) (green 0.7)
+            Vertex (Vector3.vec3 -20 -1 20) (green 0.7)
 
         topRight =
-            Vertex (vec3 20 -1 20) (green 0.4)
+            Vertex (Vector3.vec3 20 -1 20) (green 0.4)
 
         bottomLeft =
-            Vertex (vec3 -20 -1 -20) (green 0.5)
+            Vertex (Vector3.vec3 -20 -1 -20) (green 0.5)
 
         bottomRight =
-            Vertex (vec3 20 -1 -20) (green 0.6)
+            Vertex (Vector3.vec3 20 -1 -20) (green 0.6)
     in
         WebGL.Triangle [ ( topLeft, topRight, bottomLeft ), ( bottomLeft, topRight, bottomRight ) ]
 
 
 {-| Help create colors as Vectors
 -}
-color : Float -> Float -> Float -> Vec3
+color : Float -> Float -> Float -> Vector3.Vec3
 color hue saturation lightness =
     let
         c =
             Color.hsl hue saturation lightness
                 |> Color.toRgb
     in
-        vec3 (toFloat c.red / 255) (toFloat c.green / 255) (toFloat c.blue / 255)
+        Vector3.vec3 (toFloat c.red / 255) (toFloat c.green / 255) (toFloat c.blue / 255)
 
 
 {-| Vertex shader for the ground
 -}
-vertexShader : Shader Vertex { perspective : Mat4 } { vcolor : Vec3 }
+vertexShader : WebGL.Shader Vertex { perspective : Matrix4.Mat4 } { vcolor : Vector3.Vec3 }
 vertexShader =
     [glsl|
 
@@ -75,7 +75,7 @@ void main () {
 
 {-| Fragment shader for the ground
 -}
-fragmentShader : Shader {} u { vcolor : Vec3 }
+fragmentShader : WebGL.Shader {} u { vcolor : Vector3.Vec3 }
 fragmentShader =
     [glsl|
 

@@ -1,15 +1,13 @@
 module View exposing (view)
 
 import Html
+import Html.Attributes as Attributes
 import Math.Matrix4 as Matrix4
 import Math.Vector3 as Vector3
 import Model
-import View.Wall
 import View.Ground
+import View.Wall
 import WebGL
-import Html
-import Html.Attributes as Attributes
-import Model
 import Window
 
 

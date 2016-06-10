@@ -1,14 +1,14 @@
 module View.Wall exposing (renderWall)
 
-import Math.Vector2 exposing (Vec2)
-import Math.Vector3 exposing (..)
-import Math.Matrix4 exposing (..)
-import WebGL exposing (..)
+import Math.Vector2 as Vector2
+import Math.Vector3 as Vector3
+import Math.Matrix4 as Matrix4
+import WebGL
 
 
 {-| Render the visible renderCrate
 -}
-renderWall : WebGL.Texture -> Mat4 -> WebGL.Renderable
+renderWall : WebGL.Texture -> Matrix4.Mat4 -> WebGL.Renderable
 renderWall texture perspective =
     -- WebGL.render vertexShader fragmentShader wall { perspective = perspective }
     WebGL.render vertexShader fragmentShader wall { wall = texture, perspective = perspective }
@@ -17,14 +17,14 @@ renderWall texture perspective =
 {-| Describes properties of a Crate vertex
 -}
 type alias Vertex =
-    { position : Vec3, coord : Vec3 }
+    { position : Vector3.Vec3, coord : Vector3.Vec3 }
 
 
 {-| Describes a wall as a WebGL.Drawable
 -}
-wall : Drawable Vertex
+wall : WebGL.Drawable Vertex
 wall =
-    Triangle (List.concatMap rotatedFace [ ( 0, 0 ), ( 90, 0 ), ( 180, 0 ), ( 270, 0 ), ( 0, 90 ), ( 0, -90 ) ])
+    WebGL.Triangle (List.concatMap rotatedFace [ ( 0, 0 ), ( 90, 0 ), ( 180, 0 ), ( 270, 0 ), ( 0, 90 ), ( 0, -90 ) ])
 
 
 {-| Rotate a wall face
@@ -33,18 +33,18 @@ rotatedFace : ( Float, Float ) -> List ( Vertex, Vertex, Vertex )
 rotatedFace ( angleXZ, angleYZ ) =
     let
         x =
-            makeRotate (degrees angleXZ) j
+            Matrix4.makeRotate (degrees angleXZ) Vector3.j
 
         y =
-            makeRotate (degrees angleYZ) i
+            Matrix4.makeRotate (degrees angleYZ) Vector3.i
 
         t =
-            x `mul` y
+            x `Matrix4.mul` y
 
         each f ( a, b, c ) =
             ( f a, f b, f c )
     in
-        List.map (each (\v -> { v | position = transform t v.position })) face
+        List.map (each (\v -> { v | position = Matrix4.transform t v.position })) face
 
 
 {-| Constant function describing the faces of a generic wall
@@ -53,16 +53,16 @@ face : List ( Vertex, Vertex, Vertex )
 face =
     let
         topLeft =
-            Vertex (vec3 -1 1 1) (vec3 0 1 0)
+            Vertex (Vector3.vec3 -1 1 1) (Vector3.vec3 0 1 0)
 
         topRight =
-            Vertex (vec3 1 1 1) (vec3 1 1 0)
+            Vertex (Vector3.vec3 1 1 1) (Vector3.vec3 1 1 0)
 
         bottomLeft =
-            Vertex (vec3 -1 -1 1) (vec3 0 0 0)
+            Vertex (Vector3.vec3 -1 -1 1) (Vector3.vec3 0 0 0)
 
         bottomRight =
-            Vertex (vec3 1 -1 1) (vec3 1 0 0)
+            Vertex (Vector3.vec3 1 -1 1) (Vector3.vec3 1 0 0)
     in
         [ ( topLeft, topRight, bottomLeft )
         , ( bottomLeft, topRight, bottomRight )
@@ -71,7 +71,7 @@ face =
 
 {-| Vertex shader for crates
 -}
-vertexShader : WebGL.Shader { position : Vec3, coord : Vec3 } { u | perspective : Mat4 } { vcoord : Vec2 }
+vertexShader : WebGL.Shader { position : Vector3.Vec3, coord : Vector3.Vec3 } { u | perspective : Matrix4.Mat4 } { vcoord : Vector2.Vec2 }
 vertexShader =
     [glsl|
 
@@ -90,7 +90,7 @@ void main () {
 
 {-| Fragment shader for crates
 -}
-fragmentShader : WebGL.Shader {} { u | wall : WebGL.Texture } { vcoord : Vec2 }
+fragmentShader : WebGL.Shader {} { u | wall : WebGL.Texture } { vcoord : Vector2.Vec2 }
 fragmentShader =
     [glsl|
 

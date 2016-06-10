@@ -1,10 +1,10 @@
 module Model exposing (Msg(..), Model, Person, MouseMovement, Args, Keys)
 
-import Math.Vector3 as Vector3
-import Window
-import Time
 import Keyboard.Extra
+import Math.Vector3 as Vector3
+import Time
 import WebGL
+import Window
 
 
 {-| Every half a second there's an event coming through;
