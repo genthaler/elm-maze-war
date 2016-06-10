@@ -11922,6 +11922,10 @@ var _genthaler$elm_maze_war$Model$Args = F2(
 	function (a, b) {
 		return {movement: a, isLocked: b};
 	});
+var _genthaler$elm_maze_war$Model$IoC = F4(
+	function (a, b, c, d) {
+		return {requestPointerLock: a, exitPointerLock: b, movement: c, isLocked: d};
+	});
 var _genthaler$elm_maze_war$Model$Resize = function (a) {
 	return {ctor: 'Resize', _0: a};
 };
@@ -11947,17 +11951,17 @@ var _genthaler$elm_maze_war$Model$TextureError = function (a) {
 	return {ctor: 'TextureError', _0: a};
 };
 
-var _genthaler$elm_maze_war$Ports$requestPointerLock = _elm_lang$core$Native_Platform.outgoingPort(
+var _genthaler$elm_maze_war$IO$requestPointerLock = _elm_lang$core$Native_Platform.outgoingPort(
 	'requestPointerLock',
 	function (v) {
 		return null;
 	});
-var _genthaler$elm_maze_war$Ports$exitPointerLock = _elm_lang$core$Native_Platform.outgoingPort(
+var _genthaler$elm_maze_war$IO$exitPointerLock = _elm_lang$core$Native_Platform.outgoingPort(
 	'exitPointerLock',
 	function (v) {
 		return null;
 	});
-var _genthaler$elm_maze_war$Ports$movement = _elm_lang$core$Native_Platform.incomingPort(
+var _genthaler$elm_maze_war$IO$movement = _elm_lang$core$Native_Platform.incomingPort(
 	'movement',
 	A3(
 		_elm_lang$core$Json_Decode$tuple2,
@@ -11967,8 +11971,8 @@ var _genthaler$elm_maze_war$Ports$movement = _elm_lang$core$Native_Platform.inco
 			}),
 		_elm_lang$core$Json_Decode$int,
 		_elm_lang$core$Json_Decode$int));
-var _genthaler$elm_maze_war$Ports$isLocked = _elm_lang$core$Native_Platform.incomingPort('isLocked', _elm_lang$core$Json_Decode$bool);
-var _genthaler$elm_maze_war$Ports$subscriptions = function (model) {
+var _genthaler$elm_maze_war$IO$isLocked = _elm_lang$core$Native_Platform.incomingPort('isLocked', _elm_lang$core$Json_Decode$bool);
+var _genthaler$elm_maze_war$IO$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		A2(
 			_elm_lang$core$Basics_ops['++'],
@@ -11977,11 +11981,11 @@ var _genthaler$elm_maze_war$Ports$subscriptions = function (model) {
 					_elm_lang$animation_frame$AnimationFrame$diffs(_genthaler$elm_maze_war$Model$Animate),
 					A2(_elm_lang$core$Platform_Sub$map, _genthaler$elm_maze_war$Model$KeyboardExtraMsg, _ohanhi$keyboard_extra$Keyboard_Extra$subscriptions),
 					_elm_lang$window$Window$resizes(_genthaler$elm_maze_war$Model$Resize),
-					_genthaler$elm_maze_war$Ports$isLocked(_genthaler$elm_maze_war$Model$LockUpdate)
+					_genthaler$elm_maze_war$IO$isLocked(_genthaler$elm_maze_war$Model$LockUpdate)
 				]),
 			model.pointerLock.isLocked ? _elm_lang$core$Native_List.fromArray(
 				[
-					_genthaler$elm_maze_war$Ports$movement(_genthaler$elm_maze_war$Model$MouseMove)
+					_genthaler$elm_maze_war$IO$movement(_genthaler$elm_maze_war$Model$MouseMove)
 				]) : _elm_lang$core$Native_List.fromArray(
 				[
 					_elm_lang$mouse$Mouse$clicks(
@@ -11990,6 +11994,7 @@ var _genthaler$elm_maze_war$Ports$subscriptions = function (model) {
 					})
 				])));
 };
+var _genthaler$elm_maze_war$IO$ioc = A4(_genthaler$elm_maze_war$Model$IoC, _genthaler$elm_maze_war$IO$requestPointerLock, _genthaler$elm_maze_war$IO$exitPointerLock, _genthaler$elm_maze_war$IO$movement, _genthaler$elm_maze_war$IO$isLocked);
 
 var _genthaler$elm_maze_war$Update$adjustVelocity = function (v) {
 	var _p0 = _elm_community$elm_linear_algebra$Math_Vector3$toTuple(v);
@@ -12117,8 +12122,8 @@ var _genthaler$elm_maze_war$Update$toKeys = function (keyboardModel) {
 		keyList: _ohanhi$keyboard_extra$Keyboard_Extra$pressedDown(keyboardModel)
 	};
 };
-var _genthaler$elm_maze_war$Update$update = F2(
-	function (msg, model) {
+var _genthaler$elm_maze_war$Update$update = F3(
+	function (ioc, msg, model) {
 		var _p6 = msg;
 		switch (_p6.ctor) {
 			case 'TextureError':
@@ -12183,8 +12188,8 @@ var _genthaler$elm_maze_war$Update$update = F2(
 								pointerLock,
 								{wantToBeLocked: _p6._0})
 						}),
-					_1: _elm_lang$core$Native_Utils.eq(model.pointerLock.wantToBeLocked, model.pointerLock.isLocked) ? _elm_lang$core$Platform_Cmd$none : (model.pointerLock.wantToBeLocked ? _genthaler$elm_maze_war$Ports$requestPointerLock(
-						{ctor: '_Tuple0'}) : _genthaler$elm_maze_war$Ports$exitPointerLock(
+					_1: _elm_lang$core$Native_Utils.eq(model.pointerLock.wantToBeLocked, model.pointerLock.isLocked) ? _elm_lang$core$Platform_Cmd$none : (model.pointerLock.wantToBeLocked ? ioc.requestPointerLock(
+						{ctor: '_Tuple0'}) : ioc.exitPointerLock(
 						{ctor: '_Tuple0'}))
 				};
 			case 'LockUpdate':
@@ -12222,52 +12227,53 @@ var _genthaler$elm_maze_war$Update$update = F2(
 				};
 		}
 	});
-var _genthaler$elm_maze_war$Update$init = function (_p9) {
-	var _p10 = _p9;
-	var _p11 = _ohanhi$keyboard_extra$Keyboard_Extra$init;
-	var keyboardModel = _p11._0;
-	var keyboardCmd = _p11._1;
-	return {
-		ctor: '_Tuple2',
-		_0: {
-			person: {
-				position: A3(_elm_community$elm_linear_algebra$Math_Vector3$vec3, 0, _genthaler$elm_maze_war$Update$eyeLevel, -10),
-				velocity: A3(_elm_community$elm_linear_algebra$Math_Vector3$vec3, 0, 0, 0),
-				horizontalAngle: _elm_lang$core$Basics$degrees(90),
-				verticalAngle: 0,
-				direction: _genthaler$elm_maze_war$Update$direction(
-					{
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Basics$degrees(90),
-						_1: 0
-					})
+var _genthaler$elm_maze_war$Update$init = F2(
+	function (ioc, _p9) {
+		var _p10 = _p9;
+		var _p11 = _ohanhi$keyboard_extra$Keyboard_Extra$init;
+		var keyboardModel = _p11._0;
+		var keyboardCmd = _p11._1;
+		return {
+			ctor: '_Tuple2',
+			_0: {
+				person: {
+					position: A3(_elm_community$elm_linear_algebra$Math_Vector3$vec3, 0, _genthaler$elm_maze_war$Update$eyeLevel, -10),
+					velocity: A3(_elm_community$elm_linear_algebra$Math_Vector3$vec3, 0, 0, 0),
+					horizontalAngle: _elm_lang$core$Basics$degrees(90),
+					verticalAngle: 0,
+					direction: _genthaler$elm_maze_war$Update$direction(
+						{
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Basics$degrees(90),
+							_1: 0
+						})
+				},
+				keys: _genthaler$elm_maze_war$Update$toKeys(keyboardModel),
+				pointerLock: {wantToBeLocked: true, isLocked: _p10.isLocked},
+				maybeTexture: _elm_lang$core$Maybe$Nothing,
+				maybeWindowSize: _elm_lang$core$Maybe$Nothing,
+				message: 'No texture yet'
 			},
-			keys: _genthaler$elm_maze_war$Update$toKeys(keyboardModel),
-			pointerLock: {wantToBeLocked: true, isLocked: _p10.isLocked},
-			maybeTexture: _elm_lang$core$Maybe$Nothing,
-			maybeWindowSize: _elm_lang$core$Maybe$Nothing,
-			message: 'No texture yet'
-		},
-		_1: _elm_lang$core$Platform_Cmd$batch(
-			_elm_lang$core$Native_List.fromArray(
-				[
-					A3(
-					_elm_lang$core$Task$perform,
-					_genthaler$elm_maze_war$Model$TextureError,
-					_genthaler$elm_maze_war$Model$TextureLoaded,
-					_elm_community$elm_webgl$WebGL$loadTexture('woodCrate.jpg')),
-					A3(
-					_elm_lang$core$Task$perform,
-					A2(
-						_elm_lang$core$Basics$always,
+			_1: _elm_lang$core$Platform_Cmd$batch(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A3(
+						_elm_lang$core$Task$perform,
+						_genthaler$elm_maze_war$Model$TextureError,
+						_genthaler$elm_maze_war$Model$TextureLoaded,
+						_elm_community$elm_webgl$WebGL$loadTexture('woodCrate.jpg')),
+						A3(
+						_elm_lang$core$Task$perform,
+						A2(
+							_elm_lang$core$Basics$always,
+							_genthaler$elm_maze_war$Model$Resize,
+							{ctor: '_Tuple2', _0: 0, _1: 0}),
 						_genthaler$elm_maze_war$Model$Resize,
-						{ctor: '_Tuple2', _0: 0, _1: 0}),
-					_genthaler$elm_maze_war$Model$Resize,
-					_elm_lang$window$Window$size),
-					A2(_elm_lang$core$Platform_Cmd$map, _genthaler$elm_maze_war$Model$KeyboardExtraMsg, keyboardCmd)
-				]))
-	};
-};
+						_elm_lang$window$Window$size),
+						A2(_elm_lang$core$Platform_Cmd$map, _genthaler$elm_maze_war$Model$KeyboardExtraMsg, keyboardCmd)
+					]))
+		};
+	});
 
 var _genthaler$elm_maze_war$View_Ground$fragmentShader = {'src': '\n\nprecision mediump float;\nvarying vec3 vcolor;\n\nvoid main () {\n    gl_FragColor = vec4(vcolor, 1.0);\n}\n\n'};
 var _genthaler$elm_maze_war$View_Ground$vertexShader = {'src': '\n\nattribute vec3 position;\nattribute vec3 color;\nuniform mat4 perspective;\nvarying vec3 vcolor;\n\nvoid main () {\n    gl_Position = perspective * vec4(position, 1.0);\n    vcolor = color;\n}\n\n'};
@@ -12555,7 +12561,12 @@ var _genthaler$elm_maze_war$View$view = function (_p2) {
 
 var _genthaler$elm_maze_war$Main$main = {
 	main: _elm_lang$html$Html_App$programWithFlags(
-		{init: _genthaler$elm_maze_war$Update$init, update: _genthaler$elm_maze_war$Update$update, subscriptions: _genthaler$elm_maze_war$Ports$subscriptions, view: _genthaler$elm_maze_war$View$view}),
+		{
+			init: _genthaler$elm_maze_war$Update$init(_genthaler$elm_maze_war$IO$ioc),
+			update: _genthaler$elm_maze_war$Update$update(_genthaler$elm_maze_war$IO$ioc),
+			subscriptions: _genthaler$elm_maze_war$IO$subscriptions,
+			view: _genthaler$elm_maze_war$View$view
+		}),
 	flags: A2(
 		_elm_lang$core$Json_Decode$andThen,
 		A2(_elm_lang$core$Json_Decode_ops[':='], 'isLocked', _elm_lang$core$Json_Decode$bool),
