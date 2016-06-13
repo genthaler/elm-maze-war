@@ -1,4 +1,4 @@
-module Update exposing (update, init, subscriptions, eyeLevel, toKeys)
+module Update exposing (update, init, subscriptions, eyeLevel, toKeys, direction)
 
 import AnimationFrame
 import Keyboard.Extra
@@ -19,30 +19,28 @@ init ioc { isLocked } =
         ( keyboardModel, keyboardCmd ) =
             Keyboard.Extra.init
     in
-        ( { person =
-                { position = Vector3.vec3 0 eyeLevel -10
-                , velocity = Vector3.vec3 0 0 0
-                , horizontalAngle = degrees 90
-                , verticalAngle = 0
-                , direction = direction ( degrees 90, 0 )
-                }
-          , keys = toKeys keyboardModel
-          , pointerLock =
-                { wantToBeLocked = True
-                , isLocked = isLocked
-                }
-          , maybeTexture = Nothing
-          , maybeWindowSize = Nothing
-          , message = "No texture yet"
-          }
-        , Cmd.batch
-            [ WebGL.loadTexture "woodCrate.jpg"
-                |> Task.perform Model.TextureError Model.TextureLoaded
-            , Window.size
-                |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
-            , Cmd.map Model.KeyboardExtraMsg keyboardCmd
-            ]
-        )
+        { person =
+            { position = Vector3.vec3 0 eyeLevel -10
+            , velocity = Vector3.vec3 0 0 0
+            , horizontalAngle = degrees 90
+            , verticalAngle = 0
+            , direction = direction ( degrees 90, 0 )
+            }
+        , keys = toKeys keyboardModel
+        , pointerLock =
+            { wantToBeLocked = True
+            , isLocked = isLocked
+            }
+        , maybeTexture = Nothing
+        , maybeWindowSize = Nothing
+        , message = "No texture yet"
+        }
+            ! [ WebGL.loadTexture "woodCrate.jpg"
+                    |> Task.perform Model.TextureError Model.TextureLoaded
+              , Window.size
+                    |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
+              , Cmd.map Model.KeyboardExtraMsg keyboardCmd
+              ]
 
 
 {-| Take a Msg and a Model and return an updated Model
@@ -51,70 +49,62 @@ update : Model.IoC Model.Msg -> Model.Msg -> Model.Model -> ( Model.Model, Cmd M
 update ioc msg model =
     case msg of
         Model.TextureError err ->
-            ( { model | message = "Error loading texture" }
-            , Cmd.none
-            )
+            { model | message = "Error loading texture" }
+                ! []
 
         Model.TextureLoaded texture ->
-            ( { model | maybeTexture = Just texture }
-            , Cmd.none
-            )
+            { model | maybeTexture = Just texture }
+                ! []
 
         Model.KeyboardExtraMsg keyMsg ->
             let
                 ( keyboardModel, keyboardCmd ) =
                     Keyboard.Extra.update keyMsg model.keys.keyboardModel
             in
-                ( { model
+                { model
                     | keys = toKeys keyboardModel
-                  }
-                , Cmd.map Model.KeyboardExtraMsg keyboardCmd
-                )
+                }
+                    ! [ Cmd.map Model.KeyboardExtraMsg keyboardCmd ]
 
         Model.Resize windowSize ->
-            ( { model | maybeWindowSize = Just windowSize }
-            , Cmd.none
-            )
+            { model | maybeWindowSize = Just windowSize }
+                ! []
 
         Model.MouseMove movement ->
-            ( { model | person = turn movement model.person }
-            , Cmd.none
-            )
+            { model | person = turn movement model.person }
+                ! []
 
         Model.LockRequest wantToBeLocked ->
             let
                 pointerLock =
                     model.pointerLock
             in
-                ( { model | pointerLock = { pointerLock | wantToBeLocked = wantToBeLocked } }
-                , if model.pointerLock.wantToBeLocked == model.pointerLock.isLocked then
-                    Cmd.none
-                  else if model.pointerLock.wantToBeLocked then
-                    ioc.requestPointerLock ()
-                  else
-                    ioc.exitPointerLock ()
-                )
+                { model | pointerLock = { pointerLock | wantToBeLocked = wantToBeLocked } }
+                    ! if model.pointerLock.wantToBeLocked == model.pointerLock.isLocked then
+                        []
+                      else if model.pointerLock.wantToBeLocked then
+                        [ ioc.requestPointerLock () ]
+                      else
+                        [ ioc.exitPointerLock () ]
 
         Model.LockUpdate isLocked ->
             let
                 pointerLock =
                     model.pointerLock
             in
-                ( { model | pointerLock = { pointerLock | isLocked = isLocked } }
-                , Cmd.none
-                )
+                { model | pointerLock = { pointerLock | isLocked = isLocked } }
+                    ! []
 
         Model.Animate dt ->
-            ( { model
+            { model
                 | person =
                     model.person
                         |> walk model.keys.wasd
                         |> jump model.keys.spaceKey
                         |> gravity (dt / 500)
                         |> physics (dt / 500)
-              }
-            , Cmd.none
-            )
+            }
+                ! []
 
 
 {-| All subscriptions are defined here

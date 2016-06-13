@@ -1,14 +1,14 @@
 module TestRunner exposing (..)
 
-import ElmTest exposing (..)
-import Example
+import ElmTestBDDStyle exposing (..)
+import ElmTest exposing (runSuite, runSuiteHtml)
 import UpdateTest
-import ViewTest
 
 
 tests : Test
 tests =
-    UpdateTest.tests
+    describe "Elm Maze War"
+        [ UpdateTest.suite ]
 
 
 
