@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Html.App
 import Model
-import IO
+import Ports
 import Update
 import View
 
@@ -12,8 +12,8 @@ import View
 main : Program Model.Args
 main =
     Html.App.programWithFlags
-        { init = Update.init IO.ioc
-        , update = Update.update IO.ioc
-        , subscriptions = IO.subscriptions
+        { init = Update.init Ports.ioc
+        , update = Update.update Ports.ioc
+        , subscriptions = Update.subscriptions Ports.ioc
         , view = View.view
         }

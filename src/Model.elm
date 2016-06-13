@@ -5,7 +5,6 @@ import Math.Vector3 as Vector3
 import Time
 import WebGL
 import Window
-import Platform
 
 
 {-| Every half a second there's an event coming through;
@@ -75,8 +74,7 @@ type alias Model =
 {-| This is a data structure representing the arguments to Html.programWithFlags.
 -}
 type alias Args =
-    { movement : MouseMovement
-    , isLocked : Bool
+    { isLocked : Bool
     }
 
 

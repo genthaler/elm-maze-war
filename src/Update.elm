@@ -1,23 +1,20 @@
-module Update exposing (update, init, eyeLevel, toKeys)
+module Update exposing (update, init, subscriptions, eyeLevel, toKeys)
 
+import AnimationFrame
 import Keyboard.Extra
 import Math.Matrix4 as Matrix4
 import Math.Vector3 as Vector3
 import Model
+import Mouse
 import Task
 import WebGL
 import Window
 
 
-{-| When the application first starts, this is initial state of the Model.
-
-Not using the movement attribute of Args at this time;
-it's a carryover from the original, and the additional complexity
-to actually use it is probably not worth it in this case.
-It's still a useful example using Html.programWithFlags though.
+{-| Transforms program arguments into an initial Model.
 -}
 init : Model.IoC Model.Msg -> Model.Args -> ( Model.Model, Cmd Model.Msg )
-init ioc { movement, isLocked } =
+init ioc { isLocked } =
     let
         ( keyboardModel, keyboardCmd ) =
             Keyboard.Extra.init
@@ -41,7 +38,8 @@ init ioc { movement, isLocked } =
         , Cmd.batch
             [ WebGL.loadTexture "woodCrate.jpg"
                 |> Task.perform Model.TextureError Model.TextureLoaded
-            , Window.size |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
+            , Window.size
+                |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
             , Cmd.map Model.KeyboardExtraMsg keyboardCmd
             ]
         )
@@ -117,6 +115,23 @@ update ioc msg model =
               }
             , Cmd.none
             )
+
+
+{-| All subscriptions are defined here
+-}
+subscriptions : Model.IoC Model.Msg -> Model.Model -> Sub Model.Msg
+subscriptions ioc model =
+    [ AnimationFrame.diffs Model.Animate
+    , Sub.map Model.KeyboardExtraMsg Keyboard.Extra.subscriptions
+    , Window.resizes Model.Resize
+    , ioc.isLocked Model.LockUpdate
+    ]
+        ++ (if model.pointerLock.isLocked then
+                [ ioc.movement Model.MouseMove ]
+            else
+                [ Mouse.clicks (\_ -> Model.LockRequest True) ]
+           )
+        |> Sub.batch
 
 
 toKeys : Keyboard.Extra.Model -> Model.Keys
