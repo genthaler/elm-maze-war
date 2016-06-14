@@ -1,15 +1,15 @@
-module UpdateTest exposing (suite)
+module UpdateTest exposing (tests)
 
 import ElmTestBDDStyle exposing (..)
 import Check.Producer exposing (..)
 import Model exposing (..)
 import Update exposing (..)
 import Math.Vector3 as Vector3
-import Keyboard.Extra
+import Set
 
 
-suite : Test
-suite =
+tests : Test
+tests =
     describe "Update Module"
         [ initTests
         , updateTests
@@ -28,8 +28,8 @@ ioc =
 initTests : Test
 initTests =
     let
-        ( keyboardModel, keyboardCmd ) =
-            Keyboard.Extra.init
+        keyboardModel =
+            { keysDown = Set.empty }
 
         ( model, subs ) =
             Args True

@@ -5,7 +5,17 @@ This is mostly to avoid circular references between Main, Update and View,
 but is also a nice abstraction
 -}
 
+import AnimationFrame
+import Keyboard.Extra
 import Model
+import Mouse
+import Window
+import AnimationFrame
+import Keyboard.Extra
+import Model
+import Mouse
+import Task
+import WebGL
 
 
 {-| Provide the ability to request fullscreen mode. Click screen to request lock.
@@ -28,6 +38,35 @@ port movement : (( Int, Int ) -> msg) -> Sub msg
 port isLocked : (Bool -> msg) -> Sub msg
 
 
-ioc : Model.IoC msg
+{-| All ports are encapsulated here, mostly to enable mocking elsewhere
+-}
+ioc : Model.IoC Model.Msg
 ioc =
-    Model.IoC requestPointerLock exitPointerLock movement isLocked
+    Model.IoC requestPointerLock exitPointerLock movement isLocked initCmds
+
+
+{-| All subscriptions are defined here
+-}
+subscriptions : Model.IoC Model.Msg -> Model.Model -> Sub Model.Msg
+subscriptions ioc model =
+    [ AnimationFrame.diffs Model.Animate
+    , Sub.map Model.KeyboardExtraMsg Keyboard.Extra.subscriptions
+    , Window.resizes Model.Resize
+    , ioc.isLocked Model.LockUpdate
+    ]
+        ++ (if model.pointerLock.isLocked then
+                [ ioc.movement Model.MouseMove ]
+            else
+                [ Mouse.clicks (\_ -> Model.LockRequest True) ]
+           )
+        |> Sub.batch
+
+
+initCmds : Cmd Keyboard.Extra.Msg -> List (Cmd Model.Msg)
+initCmds keyboardCmd =
+    [ WebGL.loadTexture "woodCrate.jpg"
+        |> Task.perform Model.TextureError Model.TextureLoaded
+    , Window.size
+        |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
+    , Cmd.map Model.KeyboardExtraMsg keyboardCmd
+    ]
