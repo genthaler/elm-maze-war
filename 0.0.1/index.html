@@ -5,10 +5,21 @@
 </head>
 
 <body>
+    <div id="main">
+    </div>
+    <div id="test">
+    </div>
+
     <script src="elm.js"></script>
+    <script src="TestRunner.js"></script>
     <script src="PointerLock.js"></script>
     <script type="text/javascript">
-        Elm.Main.fullscreenWithPointerLock();
+        // Elm.Main.fullscreenWithPointerLock();
+        var main = document.getElementById('main');
+        Elm.Main.embedWithPointerLock(main);
+        var test = document.getElementById('test');
+
+        Elm.TestRunner.embed(test);
     </script>
 </body>
 
