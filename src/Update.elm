@@ -4,6 +4,9 @@ import Keyboard.Extra
 import Math.Matrix4 as Matrix4
 import Math.Vector3 as Vector3
 import Model
+import Task
+import WebGL
+import Window
 
 
 {-| Transforms program arguments into an initial Model.
@@ -30,7 +33,12 @@ init ioc { isLocked } =
         , maybeWindowSize = Nothing
         , message = "No texture yet"
         }
-            ! ioc.initCmds keyboardCmd
+            ! [ WebGL.loadTexture "woodCrate.jpg"
+                    |> Task.perform Model.TextureError Model.TextureLoaded
+              , Window.size
+                    |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
+              , Cmd.map Model.KeyboardExtraMsg keyboardCmd
+              ]
 
 
 {-| Take a Msg and a Model and return an updated Model

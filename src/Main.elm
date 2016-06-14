@@ -14,6 +14,6 @@ main =
     Html.App.programWithFlags
         { init = Update.init Ports.ioc
         , update = Update.update Ports.ioc
-        , subscriptions = Update.subscriptions Ports.ioc
+        , subscriptions = Ports.subscriptions Ports.ioc
         , view = View.view
         }

@@ -56,21 +56,23 @@ gulp.task('compile', ['elm-init'], function() {
 gulp.task('test-compile', ['elm-init'], function() {
   return gulp.src('test/TestRunner.elm').pipe(elm.bundle('TestRunner.js', {
     warn: true
-  })).pipe(gulp.dest('target'));
+  })).pipe(gulp.dest(dist));
 });
 gulp.task('test', ['test-compile'], function() {
   return gulp.src('target/TestRunner.js ').pipe(shell([
     'node target/TestRunner.js'
   ]))
 });
-gulp.task('package', ['validate', 'process-resources', 'compile', 'test'], noop);
+gulp.task('package', ['validate', 'process-resources', 'compile',
+  'test-compile'
+], noop);
 gulp.task('server', ['pre-server', 'process-resources', 'compile'], function() {
   browserSyncReload();
 });
 gulp.task('deploy', ['package'], function() {
   return gulp.src('./dist/**/*').pipe(ghPages({}));
 });
-gulp.task('watch', ['test', 'server'], function() {
+gulp.task('watch', ['test-compile', 'server'], function() {
   gulp.watch(['resources/**/*', 'src/**/*', 'test/**/*'], ['reload']);
 });
 gulp.task('default', ['watch'], noop);

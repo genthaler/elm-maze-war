@@ -1,4 +1,4 @@
-port module Ports exposing (ioc)
+port module Ports exposing (ioc, subscriptions)
 
 {-| Collect all ports and subscriptions into their own module.
 This is mostly to avoid circular references between Main, Update and View,
@@ -10,12 +10,6 @@ import Keyboard.Extra
 import Model
 import Mouse
 import Window
-import AnimationFrame
-import Keyboard.Extra
-import Model
-import Mouse
-import Task
-import WebGL
 
 
 {-| Provide the ability to request fullscreen mode. Click screen to request lock.
@@ -42,7 +36,7 @@ port isLocked : (Bool -> msg) -> Sub msg
 -}
 ioc : Model.IoC Model.Msg
 ioc =
-    Model.IoC requestPointerLock exitPointerLock movement isLocked initCmds
+    Model.IoC requestPointerLock exitPointerLock movement isLocked
 
 
 {-| All subscriptions are defined here
@@ -60,13 +54,3 @@ subscriptions ioc model =
                 [ Mouse.clicks (\_ -> Model.LockRequest True) ]
            )
         |> Sub.batch
-
-
-initCmds : Cmd Keyboard.Extra.Msg -> List (Cmd Model.Msg)
-initCmds keyboardCmd =
-    [ WebGL.loadTexture "woodCrate.jpg"
-        |> Task.perform Model.TextureError Model.TextureLoaded
-    , Window.size
-        |> Task.perform (always Model.Resize ( 0, 0 )) Model.Resize
-    , Cmd.map Model.KeyboardExtraMsg keyboardCmd
-    ]

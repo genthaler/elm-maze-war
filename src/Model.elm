@@ -93,5 +93,4 @@ type alias IoC msg =
     , exitPointerLock : () -> Cmd msg
     , movement : (( Int, Int ) -> msg) -> Sub msg
     , isLocked : (Bool -> msg) -> Sub msg
-    , initCmds : Cmd Keyboard.Extra.Msg -> List (Cmd msg)
     }
