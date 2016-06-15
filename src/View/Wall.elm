@@ -24,7 +24,11 @@ type alias Vertex =
 -}
 wall : WebGL.Drawable Vertex
 wall =
-    WebGL.Triangle (List.concatMap rotatedFace [ ( 0, 0 ), ( 90, 0 ), ( 180, 0 ), ( 270, 0 ), ( 0, 90 ), ( 0, -90 ) ])
+    WebGL.Triangle (List.concatMap rotatedFace [ ( 0, 0 ), ( 90, 0 ), ( 180, 0 ) ])
+
+
+
+-- , ( 270, 0 ), ( 0, 90 ) , ( 0, -90 )
 
 
 {-| Rotate a wall face

@@ -12404,10 +12404,7 @@ var _genthaler$elm_maze_war$View_Wall$wall = _elm_community$elm_webgl$WebGL$Tria
 			[
 				{ctor: '_Tuple2', _0: 0, _1: 0},
 				{ctor: '_Tuple2', _0: 90, _1: 0},
-				{ctor: '_Tuple2', _0: 180, _1: 0},
-				{ctor: '_Tuple2', _0: 270, _1: 0},
-				{ctor: '_Tuple2', _0: 0, _1: 90},
-				{ctor: '_Tuple2', _0: 0, _1: -90}
+				{ctor: '_Tuple2', _0: 180, _1: 0}
 			])));
 var _genthaler$elm_maze_war$View_Wall$renderWall = F2(
 	function (texture, perspective) {
@@ -12469,7 +12466,7 @@ var _genthaler$elm_maze_war$View$perspective = F2(
 	});
 var _genthaler$elm_maze_war$View$renderWorld = F2(
 	function (texture, perspective) {
-		var renderedCrates = _elm_lang$core$Native_List.fromArray(
+		var renderedWalls = _elm_lang$core$Native_List.fromArray(
 			[
 				A2(_genthaler$elm_maze_war$View_Wall$renderWall, texture, perspective),
 				A2(
@@ -12484,7 +12481,7 @@ var _genthaler$elm_maze_war$View$renderWorld = F2(
 		return A2(
 			_elm_lang$core$List_ops['::'],
 			_genthaler$elm_maze_war$View_Ground$renderGround(perspective),
-			renderedCrates);
+			renderedWalls);
 	});
 var _genthaler$elm_maze_war$View$layoutScene = F4(
 	function (windowSize, isLocked, texture, person) {

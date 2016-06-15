@@ -67,7 +67,9 @@ type alias Model =
     , pointerLock : PointerLock
     , maybeTexture : Maybe WebGL.Texture
     , maybeWindowSize : Maybe Window.Size
-    , message : String
+    , message :
+        String
+        -- , ground : { height : Int, width : Int }
     }
 
 

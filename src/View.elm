@@ -61,13 +61,13 @@ layoutScene windowSize isLocked texture person =
 renderWorld : WebGL.Texture -> Matrix4.Mat4 -> List WebGL.Renderable
 renderWorld texture perspective =
     let
-        renderedCrates =
+        renderedWalls =
             [ View.Wall.renderWall texture perspective
             , View.Wall.renderWall texture (Matrix4.translate3 10 0 10 perspective)
             , View.Wall.renderWall texture (Matrix4.translate3 -10 0 -10 perspective)
             ]
     in
-        (View.Ground.renderGround perspective) :: renderedCrates
+        (View.Ground.renderGround perspective) :: renderedWalls
 
 
 {-| Calculate the viewers field of view.
