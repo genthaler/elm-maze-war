@@ -12787,6 +12787,10 @@ var _elm_community$elm_webgl$Native_WebGL = function() {
     };
   var Utils  = _elm_lang$core$Native_Utils;
 
+  var rAF = typeof requestAnimationFrame !== 'undefined' ?
+    requestAnimationFrame :
+    function(cb) { setTimeout(cb, 1000 / 60); };
+
   function unsafeCoerceGLSL(src) {
     return { src : src };
   }
@@ -13002,6 +13006,10 @@ var _elm_community$elm_webgl$Native_WebGL = function() {
 
   }
 
+  function getProgID (vertID, fragID) {
+    return vertID + '#' + fragID;
+  }
+
   function drawGL(domNode, data) {
 
     var model = data.model;
@@ -13017,9 +13025,10 @@ var _elm_community$elm_webgl$Native_WebGL = function() {
       if(List.length(render.buffer._0) === 0)
           return;
 
+      var progid
       var program;
       if (render.vert.id && render.frag.id) {
-        var progid = render.vert.id + '#' + render.frag.id;
+        progid = getProgID(render.vert.id, render.frag.id);
         program = model.cache.programs[progid];
       }
 
@@ -13050,60 +13059,22 @@ var _elm_community$elm_webgl$Native_WebGL = function() {
         }
 
         program = do_link(gl, vshader, fshader);
-        var progid = render.vert.id + '#' + render.frag.id;
+        progid = getProgID(render.vert.id, render.frag.id);
         model.cache.programs[progid] = program;
 
       }
 
       gl.useProgram(program);
 
-      var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-      var textureCounter = 0;
-      for (var i = 0; i < numUniforms; i += 1) {
-        var uniform = gl.getActiveUniform(program, i);
-        var uniformLocation = gl.getUniformLocation(program, uniform.name);
-        switch (uniform.type) {
-          case gl.INT:
-            gl.uniform1i(uniformLocation, render.uniforms[uniform.name]);
-            break;
-          case gl.FLOAT:
-            gl.uniform1f(uniformLocation, render.uniforms[uniform.name]);
-            break;
-          case gl.FLOAT_VEC2:
-            gl.uniform2fv(uniformLocation, render.uniforms[uniform.name]);
-            break;
-          case gl.FLOAT_VEC3:
-            gl.uniform3fv(uniformLocation, render.uniforms[uniform.name]);
-            break;
-          case gl.FLOAT_VEC4:
-            gl.uniform4fv(uniformLocation, render.uniforms[uniform.name]);
-            break;
-          case gl.FLOAT_MAT4:
-            gl.uniformMatrix4fv(uniformLocation, false, render.uniforms[uniform.name]);
-            break;
-          case gl.SAMPLER_2D:
-            var texture = render.uniforms[uniform.name];
-            var tex = undefined;
-            if (texture.id) {
-              tex = model.cache.textures[texture.id];
-            } else {
-              texture.id = Utils.guid();
-            }
-            if (!tex) {
-              tex = do_texture(gl, texture);
-              model.cache.textures[texture.id] = tex;
-            }
-            var activeName = 'TEXTURE' + textureCounter;
-            gl.activeTexture(gl[activeName]);
-            gl.bindTexture(gl.TEXTURE_2D,tex);
-            gl.uniform1i(uniformLocation, textureCounter);
-            textureCounter += 1;
-            break;
-          default:
-            LOG("Unsupported uniform type: " + uniform.type);
-            break;
-        }
+      progid = progid || getProgID(render.vert.id, render.frag.id);
+      var setters = model.cache.uniformSetters[progid];
+      if (!setters) {
+        setters = createUniformSetters(gl, model, program);
+        model.cache.uniformSetters[progid] = setters;
       }
+
+      setUniforms(setters, render.uniforms);
+
 	  var renderType = get_render_info(gl, render.buffer.ctor);
       var buffer = model.cache.buffers[render.buffer.guid];
 
@@ -13143,6 +13114,89 @@ var _elm_community$elm_webgl$Native_WebGL = function() {
 
     A2(List.map, drawEntity, model.renderables);
     return domNode;
+  }
+
+  function createUniformSetters(gl, model, program) {
+
+    var textureCounter = 0;
+    function createUniformSetter(program, uniform) {
+      var uniformLocation = gl.getUniformLocation(program, uniform.name);
+      switch (uniform.type) {
+        case gl.INT:
+          return function (value) {
+            gl.uniform1i(uniformLocation, value);
+          };
+          break;
+        case gl.FLOAT:
+          return function (value) {
+            gl.uniform1f(uniformLocation, value);
+          };
+          break;
+        case gl.FLOAT_VEC2:
+          return function (value) {
+            gl.uniform2fv(uniformLocation, value);
+          };
+          break;
+        case gl.FLOAT_VEC3:
+          return function (value) {
+            gl.uniform3fv(uniformLocation, value);
+          };
+          break;
+        case gl.FLOAT_VEC4:
+          return function (value) {
+            gl.uniform4fv(uniformLocation, value);
+          };
+          break;
+        case gl.FLOAT_MAT4:
+          return function (value) {
+            gl.uniformMatrix4fv(uniformLocation, false, value);
+          };
+          break;
+        case gl.SAMPLER_2D:
+          var currentTexture = textureCounter;
+          var activeName = 'TEXTURE' + currentTexture;
+          textureCounter += 1;
+          return function (value) {
+            var texture = value;
+            var tex = undefined;
+            if (texture.id) {
+              tex = model.cache.textures[texture.id];
+            } else {
+              texture.id = Utils.guid();
+            }
+            if (!tex) {
+              tex = do_texture(gl, texture);
+              model.cache.textures[texture.id] = tex;
+            }
+            gl.activeTexture(gl[activeName]);
+            gl.bindTexture(gl.TEXTURE_2D,tex);
+            gl.uniform1i(uniformLocation, currentTexture);
+          };
+          break;
+        default:
+          LOG("Unsupported uniform type: " + uniform.type);
+          return function () {};
+          break;
+      }
+    }
+
+    var uniformSetters = {};
+    var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (var i = 0; i < numUniforms; i += 1) {
+      var uniform = gl.getActiveUniform(program, i);
+      uniformSetters[uniform.name] = createUniformSetter(program, uniform);
+    }
+
+    return uniformSetters;
+  }
+
+  function setUniforms(setters, values) {
+    Object.keys(values).forEach(function(name) {
+      var setter = setters[name];
+      if (setter) {
+        setter(values[name]);
+      }
+    });
   }
 
   function enable(capability) {
@@ -13243,8 +13297,17 @@ var _elm_community$elm_webgl$Native_WebGL = function() {
     model.cache.gl = gl;
     model.cache.shaders = [];
     model.cache.programs = {};
+    model.cache.uniformSetters = {};
     model.cache.buffers = [];
     model.cache.textures = [];
+
+    // Render for the first time.
+    // This has to be done in animation frame,
+    // because the canvas is not in the DOM yet,
+    // when renderCanvas is called by virtual-dom
+    rAF(function () {
+      drawGL(canvas, {model: model});
+    });
 
     return canvas;
   }
