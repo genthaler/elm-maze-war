@@ -22,4 +22,6 @@ This will open <http://localhost:4000> in your browser. Have fun!
 
 [![Build Status](https://travis-ci.org/genthaler/elm-maze-war.svg?branch=master)](https://travis-ci.org/genthaler/elm-maze-war)
 
+[![Dependency CI Status](https://dependencyci.com/github/genthaler/elm-maze-war/badge?style=flat)](https://dependencyci.com/github/genthaler/elm-maze-war/badge?style=flat)
+
 [demo]: http://genthaler.github.io/elm-maze-war/0.0.1/
