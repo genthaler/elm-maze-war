@@ -36,8 +36,8 @@ initTests =
                 |> Update.init ioc
     in
         describe "init"
-            [ it "initialises the model"
-                <| expect model
+            [ it "initialises the model" <|
+                expect model
                     toBe
                     { person =
                         { position = Vector3.vec3 0 eyeLevel -10
@@ -57,8 +57,8 @@ initTests =
                     }
               -- , it "initialises the subscriptions"
               --     <| expect subs toBe Cmd.none
-            , itAlways "ends up with the same list when reversing twice"
-                <| expectThat (\list -> List.reverse (List.reverse list))
+            , itAlways "ends up with the same list when reversing twice" <|
+                expectThat (\list -> List.reverse (List.reverse list))
                     isTheSameAs
                     (identity)
                     forEvery
@@ -69,8 +69,8 @@ initTests =
 updateTests : Test
 updateTests =
     describe "update"
-        [ it "udpates the model"
-            <| expect "model"
+        [ it "udpates the model" <|
+            expect "model"
                 toBe
                 "model"
         ]

@@ -33,7 +33,7 @@
 	"devDependencies": {
 		"browser-sync": "^2.11.1",
 		"del": "^2.2.0",
-		"elm": "^0.17.0",
+		"elm": "^0.17.1",
 		"gulp": "^3.9.0",
 		"gulp-elm": "^0.4.4",
 		"gulp-gh-pages": "^0.5.4",

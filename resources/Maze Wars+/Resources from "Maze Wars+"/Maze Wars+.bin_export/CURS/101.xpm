@@ -1,0 +1,24 @@
+/* XPM */
+static char * icon101[]={
+"16 16 3 1",
+/* colors */
+"   c  #000000",
+".  c  #ffffff",
+"X  c  None",
+/* pixels */
+"XXXXX      XXXXX",
+"XXX          XXX",
+"XX            XX",
+"X     ....     X",
+"X   ..    ..   X",
+"  ..        ..  ",
+" .  .      .  . ",
+"  ...  ..  ...  ",
+" ....  ..  .... ",
+"  ...      ...  ",
+"    ..    ..    ",
+"X     ....     X",
+"X              X",
+"XX            XX",
+"XXX          XXX",
+"XXXXX      XXXXX"}

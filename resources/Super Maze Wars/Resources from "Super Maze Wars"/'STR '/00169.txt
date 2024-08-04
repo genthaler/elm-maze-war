@@ -1,0 +1,1 @@
+Super Maze Wars requires 16 grays to operate.  Would you like to change the number of grays so that you can play now?

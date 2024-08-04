@@ -1,0 +1,1 @@
+• If a game is in progress, press -Q to end the game.• If no game is in progress, press -Q to quit Super Maze Wars.

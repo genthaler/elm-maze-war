@@ -1,0 +1,1 @@
+If any missiles are tracking you, the detector gives an indication of how close the closest missile is. When the missile is very close, the detector is filled with solid red. You can also tell the missile’s distance by listening to the missile’s beeps, which it emits when it’s tracking you. The more frequent the beeps, the closer the missile.

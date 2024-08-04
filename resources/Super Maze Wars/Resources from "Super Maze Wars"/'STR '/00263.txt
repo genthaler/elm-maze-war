@@ -1,0 +1,1 @@
+Super Maze Wars cannot start a network game because AppleTalk networking is not active.To activate AppleTalk, open Chooser and click on the AppleTalk “Active” button.

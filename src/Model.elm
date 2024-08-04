@@ -35,6 +35,23 @@ type alias Person =
     }
 
 
+{-| Dimensions of a wall
+-}
+type alias Dimensions =
+    { height : Float
+    , width : Float
+    }
+
+
+{-| Holds information about piece of wall relative to the world
+-}
+type alias Wall =
+    { size : Dimensions
+    , position : Vector3.Vec3
+    , direction : Vector3.Vec3
+    }
+
+
 type alias Keys =
     { keyboardModel : Keyboard.Extra.Model
     , spaceKey : Bool
@@ -67,9 +84,8 @@ type alias Model =
     , pointerLock : PointerLock
     , maybeTexture : Maybe WebGL.Texture
     , maybeWindowSize : Maybe Window.Size
-    , message :
-        String
-        -- , ground : { height : Int, width : Int }
+    , message : String
+    , walls : List Wall
     }
 
 

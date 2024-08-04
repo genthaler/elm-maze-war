@@ -32,6 +32,15 @@ init ioc { isLocked } =
         , maybeTexture = Nothing
         , maybeWindowSize = Nothing
         , message = "No texture yet"
+        , walls =
+            [ { size =
+                    { height = 100.0
+                    , width = 100.0
+                    }
+              , position = Vector3.vec3 0 0 0
+              , direction = Vector3.vec3 0 0 0
+              }
+            ]
         }
             ! [ WebGL.loadTexture "woodCrate.jpg"
                     |> Task.perform Model.TextureError Model.TextureLoaded
@@ -143,19 +152,19 @@ flatten v =
 turn : Model.MouseMovement -> Model.Person -> Model.Person
 turn ( dx, dy ) person =
     let
-        horizontalAngle' =
+        horizontalAngle_ =
             person.horizontalAngle + toFloat dx / 500
 
-        verticalAngle' =
+        verticalAngle_ =
             person.verticalAngle
                 - toFloat dy
                 / 500
                 |> clamp (degrees -45) (degrees 45)
     in
         { person
-            | horizontalAngle = horizontalAngle'
-            , verticalAngle = verticalAngle'
-            , direction = direction ( horizontalAngle', verticalAngle' )
+            | horizontalAngle = horizontalAngle_
+            , verticalAngle = verticalAngle_
+            , direction = direction ( horizontalAngle_, verticalAngle_ )
         }
 
 
@@ -177,7 +186,7 @@ walk directions person =
             strafe =
                 Vector3.scale (toFloat directions.x) strafeDir
         in
-            { person | velocity = adjustVelocity (move `Vector3.add` strafe) }
+            { person | velocity = adjustVelocity (Vector3.add move strafe) }
 
 
 adjustVelocity : Vector3.Vec3 -> Vector3.Vec3
@@ -206,18 +215,18 @@ physics : Float -> Model.Person -> Model.Person
 physics dt person =
     let
         position =
-            person.position `Vector3.add` Vector3.scale dt person.velocity
+            Vector3.add person.position Vector3.scale dt person.velocity
 
         p =
             Vector3.toRecord position
 
-        position' =
+        position_ =
             if p.y < eyeLevel then
                 Vector3.vec3 p.x eyeLevel p.z
             else
                 position
     in
-        { person | position = position' }
+        { person | position = position_ }
 
 
 gravity : Float -> Model.Person -> Model.Person

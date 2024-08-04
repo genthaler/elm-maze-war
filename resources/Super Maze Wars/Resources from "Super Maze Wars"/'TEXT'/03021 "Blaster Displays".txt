@@ -1,0 +1,1 @@
+Blaster Magazine Indicator. Each remaining blast is represented by one dot in the indicator.Gun Overheat Indicator. When it’s red, you are unable to fire any blasts, although you may be able to fire a missile. When it’s green, you can fire blasts. You are allowed to have up to three blasts travelling through the maze at one time.

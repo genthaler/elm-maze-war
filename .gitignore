@@ -4,3 +4,5 @@ target/
 .tags*
 npm-debug.log
 .publish/
+dist
+.DS_Store

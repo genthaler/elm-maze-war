@@ -1,0 +1,1 @@
+Super Maze Wars works best with 256 colors.  Would you like to change the number of colors for best results?

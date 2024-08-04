@@ -75,7 +75,7 @@ renderWorld texture perspective =
 perspective : Window.Size -> Model.Person -> Matrix4.Mat4
 perspective { width, height } person =
     Matrix4.mul (Matrix4.makePerspective 45 (toFloat width / toFloat height) 1.0e-2 100)
-        (Matrix4.makeLookAt person.position (person.position `Vector3.add` person.direction) Vector3.j)
+        (Matrix4.makeLookAt person.position (Vector3.add person.position person.direction) Vector3.j)
 
 
 enterMsg : List (Html.Html Model.Msg)

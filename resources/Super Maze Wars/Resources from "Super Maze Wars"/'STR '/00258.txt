@@ -1,0 +1,1 @@
+Sorry, Super Maze Wars only works with monitors capable of displaying 256 colors or 256 grays.

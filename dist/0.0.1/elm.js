@@ -11906,6 +11906,10 @@ var _genthaler$elm_maze_war$Model$Person = F5(
 	function (a, b, c, d, e) {
 		return {position: a, velocity: b, horizontalAngle: c, verticalAngle: d, direction: e};
 	});
+var _genthaler$elm_maze_war$Model$Wall = F2(
+	function (a, b) {
+		return {position: a, direction: b};
+	});
 var _genthaler$elm_maze_war$Model$Keys = F4(
 	function (a, b, c, d) {
 		return {keyboardModel: a, spaceKey: b, wasd: c, keyList: d};

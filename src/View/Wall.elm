@@ -43,7 +43,7 @@ rotatedFace ( angleXZ, angleYZ ) =
             Matrix4.makeRotate (degrees angleYZ) Vector3.i
 
         t =
-            x `Matrix4.mul` y
+            Matrix4.mul x y
 
         each f ( a, b, c ) =
             ( f a, f b, f c )
